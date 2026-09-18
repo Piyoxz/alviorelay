@@ -1,0 +1,39 @@
+# AlvioRelay Production Caddyfile
+# Automatic TLS termination via Let's Encrypt / ZeroSSL
+
+relay.yourdomain.com {
+    # Encode responses using modern gzip and zstd
+    encode zstd gzip
+
+    # Reverse proxy WebSocket signaling, HTTP API, and WHIP to AlvioRelay
+    reverse_proxy 127.0.0.1:7880 {
+        # Flush response buffers immediately for ultra-low latency streaming
+        flush_interval -1
+
+        # Preserve original client IP and protocol headers
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Optional: Serve Web Client Demo statically if co-hosted
+    # root * /var/www/alvio-demo
+    # file_server
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Access logging in JSON format
+    log {
+        output file /var/log/caddy/alvio_access.log {
+            roll_size 50mb
+            roll_keep 5
+        }
+    }
+}

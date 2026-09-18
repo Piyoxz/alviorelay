@@ -1,0 +1,92 @@
+name: Release Assets Builder
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            use_cross: false
+            archive_suffix: tar.gz
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            use_cross: true
+            archive_suffix: tar.gz
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            use_cross: false
+            archive_suffix: zip
+          - target: x86_64-apple-darwin
+            os: macos-13
+            use_cross: false
+            archive_suffix: tar.gz
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            use_cross: false
+            archive_suffix: tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross (for ARM Linux cross-compilation)
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build Binary
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }} -p alvio-relay
+          else
+            cargo build --release --target ${{ matrix.target }} -p alvio-relay
+          fi
+        shell: bash
+
+      - name: Package Binary Archive (Unix)
+        if: matrix.archive_suffix == 'tar.gz'
+        run: |
+          STAGING="alvio-relay-${{ github.ref_name }}-${{ matrix.target }}"
+          mkdir -p "$STAGING"
+          cp "target/${{ matrix.target }}/release/alvio-relay" "$STAGING/"
+          cp alvio-relay.toml README.md LICENSE-MIT LICENSE-APACHE "$STAGING/"
+          tar -czf "$STAGING.tar.gz" "$STAGING"
+          sha256sum "$STAGING.tar.gz" > "$STAGING.tar.gz.sha256"
+        shell: bash
+
+      - name: Package Binary Archive (Windows)
+        if: matrix.archive_suffix == 'zip'
+        run: |
+          $STAGING = "alvio-relay-${{ github.ref_name }}-${{ matrix.target }}"
+          New-Item -ItemType Directory -Path $STAGING
+          Copy-Item "target/${{ matrix.target }}/release/alvio-relay.exe" -Destination $STAGING
+          Copy-Item alvio-relay.toml, README.md, LICENSE-MIT, LICENSE-APACHE -Destination $STAGING
+          Compress-Archive -Path $STAGING -DestinationPath "$STAGING.zip"
+          $hash = (Get-FileHash "$STAGING.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $STAGING.zip" | Out-File -Encoding ascii "$STAGING.zip.sha256"
+        shell: powershell
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            alvio-relay-*.tar.gz*
+            alvio-relay-*.zip*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
