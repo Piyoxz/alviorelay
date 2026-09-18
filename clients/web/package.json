@@ -4,8 +4,11 @@
   "description": "High-performance TypeScript WebRTC client SDK for AlvioRelay SFU",
   "keywords": ["webrtc", "sfu", "realtime", "video", "audio", "streaming", "alviorelay"],
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "lint": "eslint src --ext .ts",
