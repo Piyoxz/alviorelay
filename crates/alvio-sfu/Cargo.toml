@@ -1,13 +1,17 @@
 [package]
 name = "alvio-sfu"
+description = "Selective Forwarding Unit (SFU) hot-path RTP packet routing, NACK buffering, PLI/FIR keyframe control, and simulcast for AlvioRelay"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
-alvio-webrtc = { path = "../alvio-webrtc" }
+alvio-core = { workspace = true }
+alvio-webrtc = { workspace = true }
+
 bytes = { workspace = true }
 dashmap = { workspace = true }
 parking_lot = { workspace = true }

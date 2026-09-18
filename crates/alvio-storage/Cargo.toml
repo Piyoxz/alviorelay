@@ -1,12 +1,16 @@
 [package]
 name = "alvio-storage"
+description = "Pluggable storage backend abstraction (Local and S3-compatible) for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
+alvio-core = { workspace = true }
+
 tokio = { workspace = true }
 bytes = { workspace = true }
 async-trait = { workspace = true }

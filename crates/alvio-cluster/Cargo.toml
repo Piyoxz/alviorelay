@@ -1,12 +1,16 @@
 [package]
 name = "alvio-cluster"
+description = "Multi-node placement, routing, and graceful node draining for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
+alvio-core = { workspace = true }
+
 tokio = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }

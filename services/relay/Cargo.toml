@@ -1,20 +1,24 @@
 [package]
 name = "alvio-relay"
+description = "Primary server daemon and CLI for AlvioRelay WebRTC SFU Media Infrastructure"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [[bin]]
 name = "alvio-relay"
 path = "src/main.rs"
 
 [dependencies]
-alvio-core = { path = "../../crates/alvio-core" }
-alvio-observe = { path = "../../crates/alvio-observe" }
-alvio-protocol = { path = "../../crates/alvio-protocol" }
-alvio-signal = { path = "../../crates/alvio-signal" }
-alvio-ingress = { path = "../../crates/alvio-ingress" }
+alvio-core = { workspace = true }
+alvio-observe = { workspace = true }
+alvio-protocol = { workspace = true }
+alvio-signal = { workspace = true }
+alvio-ingress = { workspace = true }
+
 tokio = { workspace = true }
 clap = { workspace = true }
 tracing = { workspace = true }

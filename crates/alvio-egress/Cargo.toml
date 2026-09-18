@@ -1,15 +1,19 @@
 [package]
 name = "alvio-egress"
+description = "Virtual media tap and process-isolated FFmpeg recording supervisor for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
-alvio-webrtc = { path = "../alvio-webrtc" }
-alvio-sfu = { path = "../alvio-sfu" }
-alvio-storage = { path = "../alvio-storage" }
+alvio-core = { workspace = true }
+alvio-webrtc = { workspace = true }
+alvio-sfu = { workspace = true }
+alvio-storage = { workspace = true }
+
 tokio = { workspace = true }
 bytes = { workspace = true }
 dashmap = { workspace = true }

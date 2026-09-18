@@ -1,12 +1,16 @@
 [package]
 name = "alvio-hooks"
+description = "Asynchronous webhook dispatcher with HMAC-SHA256 signature verification for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
+alvio-core = { workspace = true }
+
 tokio = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }

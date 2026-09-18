@@ -1,12 +1,16 @@
 [package]
 name = "alvio-webrtc"
+description = "WebRTC transport abstraction and sans-I/O str0m wrapper for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
+alvio-core = { workspace = true }
+
 str0m = { workspace = true }
 bytes = { workspace = true }
 thiserror = { workspace = true }

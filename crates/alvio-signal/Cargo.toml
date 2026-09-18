@@ -1,13 +1,17 @@
 [package]
 name = "alvio-signal"
+description = "WebSocket signaling state machine and in-memory room registry for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
-alvio-protocol = { path = "../alvio-protocol" }
+alvio-core = { workspace = true }
+alvio-protocol = { workspace = true }
+
 axum = { workspace = true }
 tokio = { workspace = true }
 dashmap = { workspace = true }

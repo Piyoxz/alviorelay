@@ -25,6 +25,21 @@ repository = "https://github.com/Piyoxz/alviorelay"
 homepage = "https://github.com/Piyoxz/alviorelay"
 
 [workspace.dependencies]
+# Internal workspace crates
+alvio-core = { path = "crates/alvio-core", version = "0.1.0" }
+alvio-observe = { path = "crates/alvio-observe", version = "0.1.0" }
+alvio-protocol = { path = "crates/alvio-protocol", version = "0.1.0" }
+alvio-signal = { path = "crates/alvio-signal", version = "0.1.0" }
+alvio-webrtc = { path = "crates/alvio-webrtc", version = "0.1.0" }
+alvio-sfu = { path = "crates/alvio-sfu", version = "0.1.0" }
+alvio-storage = { path = "crates/alvio-storage", version = "0.1.0" }
+alvio-egress = { path = "crates/alvio-egress", version = "0.1.0" }
+alvio-ingress = { path = "crates/alvio-ingress", version = "0.1.0" }
+alvio-hooks = { path = "crates/alvio-hooks", version = "0.1.0" }
+alvio-cluster = { path = "crates/alvio-cluster", version = "0.1.0" }
+alvio-client-core = { path = "crates/alvio-client-core", version = "0.1.0" }
+
+# Third-party dependencies
 tokio = { version = "1.40", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -41,3 +56,4 @@ dashmap = "6.1"
 uuid = { version = "1.10", features = ["v4"] }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 str0m = "0.23.1"
+

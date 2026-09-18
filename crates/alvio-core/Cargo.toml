@@ -1,9 +1,13 @@
 [package]
 name = "alvio-core"
+description = "Core domain types, configuration loader, and typed errors for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
 
 [dependencies]
 serde = { workspace = true }

@@ -5,10 +5,13 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 description = "Cross-platform core client engine for AlvioRelay (Desktop, Mobile, Embedded)"
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
-alvio-protocol = { path = "../alvio-protocol" }
+alvio-core = { workspace = true }
+alvio-protocol = { workspace = true }
+
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

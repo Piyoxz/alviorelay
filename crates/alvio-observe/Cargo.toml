@@ -1,12 +1,16 @@
 [package]
 name = "alvio-observe"
+description = "Structured logging, Prometheus metrics exposition, and health probes for AlvioRelay WebRTC SFU"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [dependencies]
-alvio-core = { path = "../alvio-core" }
+alvio-core = { workspace = true }
+
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 axum = { workspace = true }
