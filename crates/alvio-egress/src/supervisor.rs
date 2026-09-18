@@ -29,10 +29,10 @@ pub struct FfmpegCommandBuilder;
 impl FfmpegCommandBuilder {
     pub fn build_args(format: OutputFormat, output_path: &str) -> Vec<String> {
         let mut args = vec![
-            "-y".to_string(),               // Overwrite output
-            "-loglevel".to_string(),        // Controlled log output
+            "-y".to_string(),
+            "-loglevel".to_string(),
             "warning".to_string(),
-            "-i".to_string(),               // Read from standard input pipe
+            "-i".to_string(),
             "pipe:0".to_string(),
         ];
 

@@ -29,7 +29,6 @@ impl WebhookSigner {
         let mut mac = HmacSha256::new_from_slice(self.secret.as_bytes())
             .map_err(|e| WebhookError::SigningError(e.to_string()))?;
 
-        // Format: {timestamp}.{payload}
         mac.update(timestamp.to_string().as_bytes());
         mac.update(b".");
         mac.update(payload);
@@ -47,7 +46,6 @@ impl WebhookSigner {
         signature_header: &str,
         tolerance_secs: Option<u64>,
     ) -> WebhookResult<bool> {
-        // 1. Clock skew / Replay attack verification
         if let Some(tolerance) = tolerance_secs {
             let now = current_timestamp();
             let diff = now.abs_diff(timestamp);
@@ -56,7 +54,6 @@ impl WebhookSigner {
             }
         }
 
-        // 2. Signature extraction
         let sig_hex = signature_header
             .strip_prefix("sha256=")
             .unwrap_or(signature_header);
@@ -64,7 +61,6 @@ impl WebhookSigner {
         let sig_bytes = hex::decode(sig_hex)
             .map_err(|_| WebhookError::InvalidSignature)?;
 
-        // 3. Recompute and verify
         let mut mac = HmacSha256::new_from_slice(self.secret.as_bytes())
             .map_err(|e| WebhookError::SigningError(e.to_string()))?;
 

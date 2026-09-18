@@ -95,7 +95,6 @@ impl ClientRoom {
         let peers_lock = self.peers.clone();
         let tracks_lock = self.tracks.clone();
 
-        // Spawn background pump handling transport I/O
         let reader = tokio::spawn(async move {
             loop {
                 tokio::select! {
@@ -139,7 +138,6 @@ impl ClientRoom {
 
         *self.reader_task.write() = Some(reader);
 
-        // Send initial Connect handshake message
         let handshake = SignalEnvelope::new(SignalMessage::Connect {
             token,
             client_version: self.client_version.clone(),

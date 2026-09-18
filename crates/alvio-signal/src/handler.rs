@@ -35,7 +35,6 @@ async fn handle_socket(socket: WebSocket, state: SignalState) {
     let peer_id = PeerId::new(format!("peer_{}", Uuid::new_v4().simple()));
     info!(peer = %peer_id, "New signaling WebSocket connection established");
 
-    // Send initial ACK handshake
     let ack_env = SignalEnvelope::new(SignalMessage::Ack {
         peer_id: peer_id.clone(),
         node_id: state.node_id.clone(),
@@ -44,7 +43,6 @@ async fn handle_socket(socket: WebSocket, state: SignalState) {
         let _ = ws_sender.send(Message::Text(json.into())).await;
     }
 
-    // Outbound Task: mpsc receiver -> WebSocket sink
     let outbound_peer_id = peer_id.clone();
     let outbound_task = tokio::spawn(async move {
         while let Some(envelope) = rx.recv().await {
@@ -62,7 +60,6 @@ async fn handle_socket(socket: WebSocket, state: SignalState) {
         }
     });
 
-    // Inbound Loop
     let mut current_room: Option<Arc<RoomSession>> = None;
     let mut peer_name = "Anonymous".to_string();
 
@@ -105,7 +102,6 @@ async fn handle_socket(socket: WebSocket, state: SignalState) {
         }
     }
 
-    // Cleanup on disconnect
     if let Some(room) = current_room.take() {
         room.leave_peer(&peer_id, "disconnected");
     }
@@ -123,8 +119,8 @@ async fn handle_client_message(
     current_room: &mut Option<Arc<RoomSession>>,
 ) {
     match message {
-        SignalMessage::Connect { client_version, .. } => {
-            debug!(peer = %peer_id, client_version = %client_version, "Client sent Connect handshake");
+        SignalMessage::Connect { .. } => {
+            debug!(peer = %peer_id, "Received Connect handshake message");
         }
         SignalMessage::Join { room_id, peer_name: name, metadata } => {
             *peer_name = name.clone();
@@ -173,7 +169,6 @@ async fn handle_client_message(
 
                 room.publish_track(track.clone());
 
-                // Send back confirmation to publisher
                 let _ = tx.send(SignalEnvelope::new(SignalMessage::TrackPublished { track }));
                 info!(peer = %peer_id, track = %track_id, kind = %kind, "Track published");
             } else {
@@ -190,7 +185,6 @@ async fn handle_client_message(
         }
         SignalMessage::Offer { sdp } => {
             if let Some(room) = current_room.as_ref() {
-                // In Phase 2: Forward offer to peers or SFU loop
                 room.broadcast(Some(peer_id), SignalMessage::RemoteOffer { sdp: sdp.clone() });
             }
         }

@@ -116,6 +116,8 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
         .parse()
         .map_err(|e| alvio_core::AlvioError::Config(format!("Invalid RTC bind address: {e}")))?;
 
+    alvio_observe::init_server_start_time();
+
     let whip_state = alvio_ingress::WhipState::new(
         alvio_ingress::WhipRegistry::new(),
         registry,
@@ -125,7 +127,9 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
     let whip_router = alvio_ingress::create_whip_router(whip_state);
     let app = signaling_app
         .nest("/whip", whip_router)
-        .route("/metrics", axum::routing::get(alvio_observe::metrics_handler));
+        .route("/metrics", axum::routing::get(alvio_observe::metrics_handler))
+        .route("/health", axum::routing::get(alvio_observe::health_handler))
+        .route("/ready", axum::routing::get(alvio_observe::ready_handler));
 
     let addr = format!("{}:{}", config.server.bind_address, config.server.http_port);
     let listener = tokio::net::TcpListener::bind(&addr)
@@ -134,13 +138,13 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
 
     info!(
         bind = %addr,
-        "Signaling, WHIP Ingress, and Observability ready at http://{addr}/, ws://{addr}/ws, http://{addr}/whip/{{room_id}}, and http://{addr}/metrics"
+        "Signaling, WHIP Ingress, Health, and Observability ready at http://{addr}/, ws://{addr}/ws, http://{addr}/whip/{{room_id}}, http://{addr}/metrics, http://{addr}/health, and http://{addr}/ready"
     );
 
-    // Run Axum server with graceful drain mode on shutdown
     axum::serve(listener, app)
         .with_graceful_shutdown(async {
             let _ = tokio::signal::ctrl_c().await;
+            alvio_observe::set_draining(true);
             warn!("Received shutdown signal. Entering graceful drain mode...");
         })
         .await

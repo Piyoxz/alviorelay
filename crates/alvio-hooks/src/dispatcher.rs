@@ -52,7 +52,6 @@ impl WebhookDispatcher {
         let (tx, mut rx) = mpsc::channel::<WebhookEvent>(Self::DEFAULT_QUEUE_CAPACITY);
         let worker_metrics = Arc::clone(&metrics);
 
-        // Spawn background non-blocking delivery worker
         tokio::spawn(async move {
             let client = reqwest::Client::builder()
                 .timeout(Duration::from_secs(10))

@@ -160,7 +160,6 @@ mod tests {
         assert_eq!(packet.header.ssrc, 0x11223344);
         assert_eq!(packet.payload.as_ref(), b"sample_vp8_frame_payload");
 
-        // Rewrite SSRC to 0xAABBCCDD and sequence number to 100
         let rewritten = packet.with_rewritten_meta(0xAABBCCDD, 100, 95000);
         assert_eq!(rewritten.header.ssrc, 0xAABBCCDD);
         assert_eq!(rewritten.header.sequence_number, 100);

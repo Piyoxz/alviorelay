@@ -36,7 +36,6 @@ pub extern "C" fn alvio_client_create(version: *const c_char) -> *mut AlvioClien
     let mut broadcast_rx = room.subscribe_events();
     let (event_tx, event_rx) = mpsc::unbounded_channel();
 
-    // Bridge broadcast events to unbounded poll queue
     runtime.spawn(async move {
         while let Ok(event) = broadcast_rx.recv().await {
             if event_tx.send(event).is_err() {

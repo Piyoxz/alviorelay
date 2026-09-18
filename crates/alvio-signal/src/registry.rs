@@ -73,7 +73,6 @@ impl RoomSession {
         let info = peer.info();
         self.peers.insert(peer.id.clone(), peer);
 
-        // Broadcast to all other peers that this peer joined
         let sender_id = info.id.clone();
         self.broadcast(
             Some(&sender_id),
@@ -88,7 +87,6 @@ impl RoomSession {
         if let Some((_, peer)) = self.peers.remove(peer_id) {
             info!(room = %self.id, peer = %peer_id, reason = %reason, "Peer left room");
 
-            // Unpublish all tracks owned by this peer
             let tracks_to_remove: Vec<TrackId> = self
                 .tracks
                 .iter()
@@ -100,7 +98,6 @@ impl RoomSession {
                 self.unpublish_track(&track_id);
             }
 
-            // Broadcast peer_left
             self.broadcast(
                 None,
                 SignalMessage::PeerLeft {
@@ -162,14 +159,12 @@ impl RoomSession {
         let envelope = SignalEnvelope::new(msg);
 
         if destination_peer_ids.is_empty() {
-            // Broadcast to all other peers
             for entry in self.peers.iter() {
                 if entry.key() != source_peer_id {
                     let _ = entry.value().tx.send(envelope.clone());
                 }
             }
         } else {
-            // Send only to specified destinations
             for dest in destination_peer_ids {
                 if let Some(peer) = self.peers.get(dest) {
                     let _ = peer.tx.send(envelope.clone());

@@ -110,7 +110,6 @@ impl RtpRouter {
     pub fn route_packet_with_keyframe(&self, packet: &AlvioRtpPacket, is_keyframe: bool) -> Vec<AlvioRtpPacket> {
         let packet_ssrc = packet.header.ssrc;
 
-        // Cache packet in NACK ring buffer for instant local retransmission
         if let Some(buffer) = self.nack_buffers.get(&packet_ssrc) {
             buffer.put(packet.clone());
         }

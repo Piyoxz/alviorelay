@@ -110,23 +110,18 @@ mod tests {
         let test_path = "room-alpha/session-1/video.mp4";
         let test_data = Bytes::from_static(b"fake-mp4-video-stream-content");
 
-        // Initial check: does not exist
         assert!(!storage.exists(test_path).await.unwrap());
 
-        // Put file
         let meta = storage.put(test_path, test_data.clone()).await.unwrap();
         assert_eq!(meta.path, test_path);
         assert_eq!(meta.size_bytes, test_data.len() as u64);
         assert_eq!(meta.content_type, "video/mp4");
 
-        // Now exists
         assert!(storage.exists(test_path).await.unwrap());
 
-        // Get file
         let fetched = storage.get(test_path).await.unwrap();
         assert_eq!(fetched, test_data);
 
-        // Delete file
         storage.delete(test_path).await.unwrap();
         assert!(!storage.exists(test_path).await.unwrap());
     }
