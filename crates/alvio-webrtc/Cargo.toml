@@ -1,0 +1,13 @@
+[package]
+name = "alvio-webrtc"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+alvio-core = { path = "../alvio-core" }
+str0m = { workspace = true }
+bytes = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }

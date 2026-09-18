@@ -1,0 +1,15 @@
+[package]
+name = "alvio-sfu"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+alvio-core = { path = "../alvio-core" }
+alvio-webrtc = { path = "../alvio-webrtc" }
+bytes = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
