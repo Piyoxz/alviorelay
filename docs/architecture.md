@@ -48,3 +48,17 @@ AlvioRelay is a Selective Forwarding Unit (SFU) designed from the ground up in R
   - Translates SSRC to the consumer's agreed SSRC.
   - Rewrites sequence numbers to maintain a continuous stream without gaps.
 - `AlvioTransport` encrypts the packet with the subscriber's SRTP keys and transmits it over UDP.
+
+## 4. Multi-Platform Client Ecosystem
+
+AlvioRelay is engineered as a **Universal Real-Time Media Server**. Any client capable of WebSocket JSON signaling and standard WebRTC (DTLS-SRTP, ICE, Opus/VP8/H.264/AV1) can participate:
+
+| Target Platform | Technology Stack & SDK | Features & Capabilities |
+| :--- | :--- | :--- |
+| **Web Browser** | `@alviorelay/client` (TypeScript) | Native browser WebRTC W3C API, React / Vue / Svelte hooks, Screen share, Zero plugins required. |
+| **Windows Desktop** | `alvio-desktop-windows` (C++ / Rust / WinUI / WPF) | Native `.exe`, WASAPI audio capture, Direct3D / DXGI screen capture, low-latency gaming & streaming. |
+| **macOS & Linux Desktop** | `alvio-desktop-unix` (Swift Metal / GTK / Qt / Tauri) | CoreMedia / PipeWire capture, native tray apps, hardware acceleration. |
+| **Mobile (Android)** | `alvio-android` (Kotlin / Android WebRTC) | Camera2 API, AudioRecord / AAudio, background call services, picture-in-picture. |
+| **Mobile (iOS)** | `alvio-ios` (Swift / iOS WebRTC) | AVFoundation, CallKit integration, ReplayKit screen broadcasting. |
+| **Cross-Platform Hybrid** | `alvio_flutter` & `@alviorelay/react-native` | Unified codebase for mobile and desktop apps with high-performance native bridges. |
+

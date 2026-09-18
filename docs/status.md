@@ -23,7 +23,7 @@ Classification:
 | **SFU** | SSRC & Sequence Alignment | `IMPLEMENTED` | Phase 4 | Continuous numbering |
 | **SFU** | NACK Ring Buffer & PLI / FIR | `IMPLEMENTED` | Phase 5 | Packet loss recovery |
 | **SFU** | TWCC & Bandwidth Estimation | `IMPLEMENTED` | Phase 5 | Congestion control |
-| **SFU** | Simulcast Layer Selection | `PLANNED` | Phase 6 | Low/Med/High switching |
+| **SFU** | Simulcast Layer Selection | `IMPLEMENTED` | Phase 6 | Low/Med/High switching |
 | **Data** | WebRTC Data Channels | `PLANNED` | Phase 7 | Reliable & Unreliable |
 | **Egress** | Virtual Recording Peer | `PLANNED` | Phase 8 | Non-blocking tap |
 | **Egress** | FFmpeg Process Supervisor | `PLANNED` | Phase 8 | Isolated worker process |
@@ -33,5 +33,10 @@ Classification:
 | **Observability**| Prometheus `/metrics` & Health | `PLANNED` | Phase 11 | `/health` and `/ready` |
 | **Scaling** | Node Placement & Drain Mode | `PLANNED` | Phase 12 | Authoritative room node |
 | **Packaging** | Dockerfile & Docker Compose | `PLANNED` | Phase 13 | Self-hosted 1-command up |
-| **Client SDK** | `@alviorelay/client` (TS) | `PLANNED` | Phase 14 | Browser library |
+| **Client SDK (Web)** | `@alviorelay/client` (TypeScript) | `PLANNED` | Phase 14 | Modern browsers (Chrome, Firefox, Safari, Edge) |
+| **Client SDK (Desktop Windows)** | `alvio-desktop-windows` (C++ / Rust / WinUI) | `PLANNED` | Phase 14 | Native Windows `.exe`, low-latency audio/video capture |
+| **Client SDK (Desktop macOS & Linux)** | `alvio-desktop-unix` (Swift / Metal / GTK / Tauri) | `PLANNED` | Phase 14 | Native macOS & Linux desktop apps |
+| **Client SDK (Mobile Android)** | `alvio-android` (Kotlin / Android WebRTC) | `PLANNED` | Phase 14 | Android phones, tablets, smart TVs |
+| **Client SDK (Mobile iOS)** | `alvio-ios` (Swift / iOS WebRTC) | `PLANNED` | Phase 14 | iPhone, iPad, Apple Silicon |
+| **Client SDK (Cross-Platform)** | `alvio_flutter` & `@alviorelay/react-native` | `PLANNED` | Phase 14 | Multi-platform mobile/desktop hybrid apps |
 | **Benchmarks** | Criterion Packet Routing Bench | `PLANNED` | Phase 15 | Sub-microsecond hot path |
