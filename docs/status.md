@@ -15,8 +15,8 @@ Classification:
 | **Foundation** | Core Domain Types & Errors | `IMPLEMENTED` | Phase 1 | `alvio-core/src/types.rs` |
 | **Foundation** | Structured Logging & Signals | `IMPLEMENTED` | Phase 1 | `alvio-observe` |
 | **CLI** | `alvio-relay` primary binary | `IMPLEMENTED` | Phase 1 | start, check, config, version |
-| **Signaling** | WebSocket Handshake & Engine | `PLANNED` | Phase 2 | JSON v1 schema |
-| **Signaling** | In-Memory Room & Peer Registry | `PLANNED` | Phase 2 | Lock-free DashMap |
+| **Signaling** | WebSocket Handshake & Engine | `IMPLEMENTED` | Phase 2 | JSON v1 schema & Axum WS |
+| **Signaling** | In-Memory Room & Peer Registry | `IMPLEMENTED` | Phase 2 | Lock-free DashMap & pub/sub |
 | **WebRTC Core** | `AlvioTransport` abstraction | `PLANNED` | Phase 3 | str0m sans-I/O wrapper |
 | **WebRTC Core** | ICE / DTLS-SRTP Handshake | `PLANNED` | Phase 3 | Peer-to-peer media path |
 | **SFU** | RTP Packet Router (Hot Path) | `PLANNED` | Phase 4 | Zero-allocation Bytes |

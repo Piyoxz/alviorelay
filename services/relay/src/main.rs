@@ -1,5 +1,6 @@
 use alvio_core::{AlvioConfig, AlvioResult};
 use alvio_observe::init_telemetry;
+use alvio_signal::{create_signaling_router, RoomRegistry};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing::{info, warn};
@@ -108,17 +109,28 @@ fn print_banner(config: &AlvioConfig) {
 }
 
 async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
+    let registry = RoomRegistry::new(config.room.max_peers_per_room);
+    let app = create_signaling_router(registry, config.server.node_id.clone());
+
+    let addr = format!("{}:{}", config.server.bind_address, config.server.http_port);
+    let listener = tokio::net::TcpListener::bind(&addr)
+        .await
+        .map_err(|e| alvio_core::AlvioError::Internal(format!("Failed to bind to {addr}: {e}")))?;
+
     info!(
-        bind = format!("{}:{}", config.server.bind_address, config.server.http_port),
-        "Signaling and HTTP gateway ready to accept incoming connections"
+        bind = %addr,
+        "Signaling and HTTP gateway ready at http://{addr}/ and ws://{addr}/ws"
     );
 
-    // Wait for shutdown signal (Ctrl+C / SIGINT)
-    tokio::signal::ctrl_c()
+    // Run Axum server with graceful drain mode on shutdown
+    axum::serve(listener, app)
+        .with_graceful_shutdown(async {
+            let _ = tokio::signal::ctrl_c().await;
+            warn!("Received shutdown signal. Entering graceful drain mode...");
+        })
         .await
-        .map_err(|e| alvio_core::AlvioError::Internal(format!("Signal handler failed: {e}")))?;
+        .map_err(|e| alvio_core::AlvioError::Internal(format!("Server error: {e}")))?;
 
-    warn!("Received shutdown signal. Entering graceful drain mode...");
     info!("Disconnecting peers and flushing remaining telemetry...");
     info!("AlvioRelay shutdown completed cleanly.");
 

@@ -12,7 +12,10 @@ path = "src/main.rs"
 [dependencies]
 alvio-core = { path = "../../crates/alvio-core" }
 alvio-observe = { path = "../../crates/alvio-observe" }
+alvio-protocol = { path = "../../crates/alvio-protocol" }
+alvio-signal = { path = "../../crates/alvio-signal" }
 tokio = { workspace = true }
 clap = { workspace = true }
 tracing = { workspace = true }
 serde_json = { workspace = true }
+axum = { workspace = true }
