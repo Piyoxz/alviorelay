@@ -6,6 +6,8 @@ members = [
     "crates/alvio-signal",
     "crates/alvio-webrtc",
     "crates/alvio-sfu",
+    "crates/alvio-storage",
+    "crates/alvio-egress",
     "services/relay",
 ]
 resolver = "2"

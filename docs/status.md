@@ -25,9 +25,9 @@ Classification:
 | **SFU** | TWCC & Bandwidth Estimation | `IMPLEMENTED` | Phase 5 | Congestion control |
 | **SFU** | Simulcast Layer Selection | `IMPLEMENTED` | Phase 6 | Low/Med/High switching |
 | **Data** | WebRTC Data Channels | `IMPLEMENTED` | Phase 7 | Reliable & Unreliable |
-| **Egress** | Virtual Recording Peer | `PLANNED` | Phase 8 | Non-blocking tap |
-| **Egress** | FFmpeg Process Supervisor | `PLANNED` | Phase 8 | Isolated worker process |
-| **Storage** | StorageBackend (Local & S3) | `PLANNED` | Phase 8 | Pluggable trait |
+| **Egress** | Virtual Recording Peer | `IMPLEMENTED` | Phase 8 | Non-blocking tap |
+| **Egress** | FFmpeg Process Supervisor | `IMPLEMENTED` | Phase 8 | Isolated worker process |
+| **Storage** | StorageBackend (Local & S3) | `IMPLEMENTED` | Phase 8 | Pluggable trait |
 | **Ingress** | WHIP Endpoint | `PLANNED` | Phase 9 | OBS / WebRTC ingest |
 | **Hooks** | Webhook Dispatcher & HMAC | `PLANNED` | Phase 10 | Retry & backoff |
 | **Observability**| Prometheus `/metrics` & Health | `PLANNED` | Phase 11 | `/health` and `/ready` |
