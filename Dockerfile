@@ -6,6 +6,14 @@ FROM rust:1.82-bookworm AS builder
 
 WORKDIR /usr/src/alvio
 
+# Install build dependencies for cryptographic and WebRTC compilation (aws-lc-sys requires cmake and clang)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake \
+    clang \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy workspace dependencies and source trees
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
