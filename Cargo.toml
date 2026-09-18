@@ -26,7 +26,7 @@ homepage = "https://github.com/Piyoxz/alviorelay"
 
 [workspace.dependencies]
 # Internal workspace crates
-alvio-core = { path = "crates/alvio-core", version = "0.1.0" }
+alvio-core = { path = "crates/alvio-core", version = "0.1.1" }
 alvio-observe = { path = "crates/alvio-observe", version = "0.1.0" }
 alvio-protocol = { path = "crates/alvio-protocol", version = "0.1.0" }
 alvio-signal = { path = "crates/alvio-signal", version = "0.1.0" }
