@@ -174,7 +174,9 @@ async fn test_whip_full_lifecycle() {
         .method("PATCH")
         .uri(&resource_uri)
         .header(header::CONTENT_TYPE, "application/trickle-ice-sdpfrag")
-        .body(Body::from("candidate:1 1 UDP 2130706431 192.168.1.100 5004 typ host"))
+        .body(Body::from(
+            "candidate:1 1 UDP 2130706431 192.168.1.100 5004 typ host",
+        ))
         .unwrap();
 
     let patch_resp = router.clone().oneshot(patch_req).await.unwrap();

@@ -109,7 +109,11 @@ mod tests {
 
         let room_id = RoomId::from("livestream-studio");
         let peer_id = PeerId::from("obs-encoder-1");
-        let session = registry.create_session(room_id.clone(), peer_id.clone(), Some("secret_key_123".into()));
+        let session = registry.create_session(
+            room_id.clone(),
+            peer_id.clone(),
+            Some("secret_key_123".into()),
+        );
 
         assert_eq!(registry.active_count(), 1);
         assert_eq!(session.room_id, room_id);
@@ -117,7 +121,8 @@ mod tests {
         assert_eq!(session.stream_key.as_deref(), Some("secret_key_123"));
 
         // Add trickle ICE candidate
-        session.add_candidate("candidate:1 1 UDP 2130706431 192.168.1.50 50000 typ host".to_string());
+        session
+            .add_candidate("candidate:1 1 UDP 2130706431 192.168.1.50 50000 typ host".to_string());
         assert_eq!(session.candidate_count(), 1);
 
         // Fetch session

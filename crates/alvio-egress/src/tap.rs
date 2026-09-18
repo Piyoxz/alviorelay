@@ -39,7 +39,8 @@ impl MediaTap {
         match self.tx.try_send(packet) {
             Ok(()) => {
                 self.packets_captured.fetch_add(1, Ordering::Relaxed);
-                self.bytes_captured.fetch_add(payload_len, Ordering::Relaxed);
+                self.bytes_captured
+                    .fetch_add(payload_len, Ordering::Relaxed);
             }
             Err(mpsc::error::TrySendError::Full(_)) => {
                 warn!("MediaTap bounded queue is full, dropping frame to preserve SFU real-time stability");

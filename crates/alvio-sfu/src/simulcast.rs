@@ -46,7 +46,7 @@ pub struct LayerSelector {
 }
 
 impl LayerSelector {
-    pub const DEFAULT_LOW_THRESHOLD_BPS: u64 = 300_000;   // 300 kbps
+    pub const DEFAULT_LOW_THRESHOLD_BPS: u64 = 300_000; // 300 kbps
     pub const DEFAULT_MID_THRESHOLD_BPS: u64 = 1_000_000; // 1 Mbps
 
     pub fn new(low_threshold: u64, mid_threshold: u64) -> Self {
@@ -70,7 +70,10 @@ impl LayerSelector {
 
 impl Default for LayerSelector {
     fn default() -> Self {
-        Self::new(Self::DEFAULT_LOW_THRESHOLD_BPS, Self::DEFAULT_MID_THRESHOLD_BPS)
+        Self::new(
+            Self::DEFAULT_LOW_THRESHOLD_BPS,
+            Self::DEFAULT_MID_THRESHOLD_BPS,
+        )
     }
 }
 

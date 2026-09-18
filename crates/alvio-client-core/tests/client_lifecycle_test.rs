@@ -1,12 +1,10 @@
-use std::ffi::CString;
 use alvio_client_core::ffi::{
     alvio_client_create, alvio_client_destroy, alvio_client_poll_event, alvio_client_state,
 };
-use alvio_client_core::{
-    ClientEvent, ClientRoom, ConnectionState, MockSignalingTransport,
-};
+use alvio_client_core::{ClientEvent, ClientRoom, ConnectionState, MockSignalingTransport};
 use alvio_core::{PeerId, RoomId, StreamKind, StreamLayer, TrackId};
 use alvio_protocol::{PeerInfo, SignalEnvelope, SignalMessage, TrackInfo};
+use std::ffi::CString;
 
 #[tokio::test]
 async fn test_client_connect_and_room_lifecycle() {
@@ -78,9 +76,13 @@ async fn test_client_connect_and_room_lifecycle() {
 
     // 3. Client joins room
     let target_room = RoomId::new("room-engineering");
-    room.join(target_room.clone(), "Alice", Some(r#"{"role":"presenter"}"#.into()))
-        .await
-        .unwrap();
+    room.join(
+        target_room.clone(),
+        "Alice",
+        Some(r#"{"role":"presenter"}"#.into()),
+    )
+    .await
+    .unwrap();
 
     let join_msg = server.recv_from_client().await.unwrap();
     match join_msg.body {
@@ -165,7 +167,11 @@ async fn test_client_connect_and_room_lifecycle() {
     let mut found_data = false;
     for _ in 0..20 {
         while let Ok(evt) = event_rx.try_recv() {
-            if let ClientEvent::DataReceived { source_peer_id, payload } = evt {
+            if let ClientEvent::DataReceived {
+                source_peer_id,
+                payload,
+            } = evt
+            {
                 assert_eq!(source_peer_id, bob_peer.id.clone());
                 assert_eq!(payload, "Hello Alice!");
                 found_data = true;

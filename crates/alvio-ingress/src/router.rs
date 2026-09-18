@@ -9,7 +9,10 @@ use axum::{
 /// Creates the Axum Router mounting all WHIP Ingress endpoints.
 pub fn create_whip_router(state: WhipState) -> Router {
     Router::new()
-        .route("/{room_id}", post(whip_publish_handler).options(whip_options_handler))
+        .route(
+            "/{room_id}",
+            post(whip_publish_handler).options(whip_options_handler),
+        )
         .route(
             "/resource/{resource_id}",
             options(whip_options_handler)

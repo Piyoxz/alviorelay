@@ -83,7 +83,8 @@ impl ClusterNode {
     }
 
     pub fn heartbeat(&self) {
-        self.last_heartbeat.store(current_timestamp(), Ordering::Relaxed);
+        self.last_heartbeat
+            .store(current_timestamp(), Ordering::Relaxed);
     }
 }
 
@@ -112,6 +113,9 @@ mod tests {
         // Drain node
         node.set_status(NodeStatus::Draining);
         assert_eq!(node.status(), NodeStatus::Draining);
-        assert!(!node.is_available(), "Draining node must not be available for new rooms");
+        assert!(
+            !node.is_available(),
+            "Draining node must not be available for new rooms"
+        );
     }
 }

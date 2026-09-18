@@ -65,27 +65,26 @@ async fn handle_socket(socket: WebSocket, state: SignalState) {
 
     while let Some(msg_result) = ws_receiver.next().await {
         match msg_result {
-            Ok(Message::Text(text)) => {
-                match SignalEnvelope::from_json(&text) {
-                    Ok(envelope) => {
-                        handle_client_message(
-                            &peer_id,
-                            &mut peer_name,
-                            &envelope.body,
-                            &tx,
-                            &state,
-                            &mut current_room,
-                        ).await;
-                    }
-                    Err(e) => {
-                        warn!(peer = %peer_id, error = %e, "Invalid JSON received from client");
-                        let _ = tx.send(SignalEnvelope::new(SignalMessage::Error {
-                            code: "INVALID_JSON".to_string(),
-                            message: format!("Malformed signaling payload: {e}"),
-                        }));
-                    }
+            Ok(Message::Text(text)) => match SignalEnvelope::from_json(&text) {
+                Ok(envelope) => {
+                    handle_client_message(
+                        &peer_id,
+                        &mut peer_name,
+                        &envelope.body,
+                        &tx,
+                        &state,
+                        &mut current_room,
+                    )
+                    .await;
                 }
-            }
+                Err(e) => {
+                    warn!(peer = %peer_id, error = %e, "Invalid JSON received from client");
+                    let _ = tx.send(SignalEnvelope::new(SignalMessage::Error {
+                        code: "INVALID_JSON".to_string(),
+                        message: format!("Malformed signaling payload: {e}"),
+                    }));
+                }
+            },
             Ok(Message::Ping(payload)) => {
                 let _ = tx.send(SignalEnvelope::new(SignalMessage::Pong));
                 debug!(peer = %peer_id, len = payload.len(), "Received WS Ping");
@@ -122,7 +121,11 @@ async fn handle_client_message(
         SignalMessage::Connect { .. } => {
             debug!(peer = %peer_id, "Received Connect handshake message");
         }
-        SignalMessage::Join { room_id, peer_name: name, metadata } => {
+        SignalMessage::Join {
+            room_id,
+            peer_name: name,
+            metadata,
+        } => {
             *peer_name = name.clone();
             let room = state.registry.get_or_create(room_id);
 
@@ -156,7 +159,11 @@ async fn handle_client_message(
                 }
             }
         }
-        SignalMessage::PublishTrack { kind, source, layers } => {
+        SignalMessage::PublishTrack {
+            kind,
+            source,
+            layers,
+        } => {
             if let Some(room) = current_room.as_ref() {
                 let track_id = TrackId::new(format!("trk_{}", Uuid::new_v4().simple()));
                 let track = TrackInfo {
@@ -185,24 +192,41 @@ async fn handle_client_message(
         }
         SignalMessage::Offer { sdp } => {
             if let Some(room) = current_room.as_ref() {
-                room.broadcast(Some(peer_id), SignalMessage::RemoteOffer { sdp: sdp.clone() });
+                room.broadcast(
+                    Some(peer_id),
+                    SignalMessage::RemoteOffer { sdp: sdp.clone() },
+                );
             }
         }
         SignalMessage::Answer { sdp } => {
             if let Some(room) = current_room.as_ref() {
-                room.broadcast(Some(peer_id), SignalMessage::RemoteAnswer { sdp: sdp.clone() });
+                room.broadcast(
+                    Some(peer_id),
+                    SignalMessage::RemoteAnswer { sdp: sdp.clone() },
+                );
             }
         }
-        SignalMessage::Candidate { candidate, sdp_mid, sdp_mline_index } => {
+        SignalMessage::Candidate {
+            candidate,
+            sdp_mid,
+            sdp_mline_index,
+        } => {
             if let Some(room) = current_room.as_ref() {
-                room.broadcast(Some(peer_id), SignalMessage::RemoteCandidate {
-                    candidate: candidate.clone(),
-                    sdp_mid: sdp_mid.clone(),
-                    sdp_mline_index: *sdp_mline_index,
-                });
+                room.broadcast(
+                    Some(peer_id),
+                    SignalMessage::RemoteCandidate {
+                        candidate: candidate.clone(),
+                        sdp_mid: sdp_mid.clone(),
+                        sdp_mline_index: *sdp_mline_index,
+                    },
+                );
             }
         }
-        SignalMessage::DataMessage { destination_peer_ids, payload, .. } => {
+        SignalMessage::DataMessage {
+            destination_peer_ids,
+            payload,
+            ..
+        } => {
             if let Some(room) = current_room.as_ref() {
                 room.send_direct_data(peer_id, destination_peer_ids, payload);
             }

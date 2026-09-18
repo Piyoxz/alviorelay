@@ -46,24 +46,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match cli.command.unwrap_or(Commands::Start { port: None }) {
         Commands::Version => {
             println!("AlvioRelay Media Server v{}", env!("CARGO_PKG_VERSION"));
-            println!("Architecture: {}-{}", std::env::consts::OS, std::env::consts::ARCH);
+            println!(
+                "Architecture: {}-{}",
+                std::env::consts::OS,
+                std::env::consts::ARCH
+            );
             println!("License: MIT OR Apache-2.0");
         }
-        Commands::Check => {
-            match AlvioConfig::load_from_file_or_default(&config_path) {
-                Ok(config) => {
-                    println!("Configuration '{}' is VALID.", config_path.display());
-                    println!("Node ID    : {}", config.server.node_id);
-                    println!("Bind Addr  : {}:{}", config.server.bind_address, config.server.http_port);
-                    println!("RTC UDP    : {}", config.rtc.udp_port);
-                    println!("Auth       : {}", config.auth.provider);
-                }
-                Err(e) => {
-                    eprintln!("Configuration check FAILED: {e}");
-                    std::process::exit(1);
-                }
+        Commands::Check => match AlvioConfig::load_from_file_or_default(&config_path) {
+            Ok(config) => {
+                println!("Configuration '{}' is VALID.", config_path.display());
+                println!("Node ID    : {}", config.server.node_id);
+                println!(
+                    "Bind Addr  : {}:{}",
+                    config.server.bind_address, config.server.http_port
+                );
+                println!("RTC UDP    : {}", config.rtc.udp_port);
+                println!("Auth       : {}", config.auth.provider);
             }
-        }
+            Err(e) => {
+                eprintln!("Configuration check FAILED: {e}");
+                std::process::exit(1);
+            }
+        },
         Commands::Config => {
             let config = AlvioConfig::load_from_file_or_default(&config_path)?;
             let json = serde_json::to_string_pretty(&config)?;
@@ -96,7 +101,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn print_banner(config: &AlvioConfig) {
-    println!(r#"
+    println!(
+        r#"
        ___    __      _       ____      __           
       /   |  / /_  __(_)___  / __ \___ / /___ ___  __
      / /| | / / / / / / __ \/ /_/ / _ \/ / __ `/ / / /
@@ -105,7 +111,10 @@ fn print_banner(config: &AlvioConfig) {
                                              /____/   
    Rust-Native Self-Hosted Real-Time Media Infrastructure
    Version: {} | Node: {}
-"#, env!("CARGO_PKG_VERSION"), config.server.node_id);
+"#,
+        env!("CARGO_PKG_VERSION"),
+        config.server.node_id
+    );
 }
 
 async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
@@ -118,16 +127,15 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
 
     alvio_observe::init_server_start_time();
 
-    let whip_state = alvio_ingress::WhipState::new(
-        alvio_ingress::WhipRegistry::new(),
-        registry,
-        rtc_addr,
-        None,
-    );
+    let whip_state =
+        alvio_ingress::WhipState::new(alvio_ingress::WhipRegistry::new(), registry, rtc_addr, None);
     let whip_router = alvio_ingress::create_whip_router(whip_state);
     let app = signaling_app
         .nest("/whip", whip_router)
-        .route("/metrics", axum::routing::get(alvio_observe::metrics_handler))
+        .route(
+            "/metrics",
+            axum::routing::get(alvio_observe::metrics_handler),
+        )
         .route("/health", axum::routing::get(alvio_observe::health_handler))
         .route("/ready", axum::routing::get(alvio_observe::ready_handler));
 

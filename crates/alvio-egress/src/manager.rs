@@ -38,7 +38,10 @@ impl RecordingManager {
     /// Starts an active recording session for a room.
     ///
     /// Returns the assigned `session_id` and the `MediaTap` handle to attach to the SFU router.
-    pub fn start_recording(&self, config: RecordingConfig) -> EgressResult<(String, Arc<MediaTap>)> {
+    pub fn start_recording(
+        &self,
+        config: RecordingConfig,
+    ) -> EgressResult<(String, Arc<MediaTap>)> {
         let room_id = config.room_id.clone();
 
         if self.room_to_session.contains_key(&room_id) {
@@ -60,7 +63,8 @@ impl RecordingManager {
         };
 
         self.sessions.insert(session_id.clone(), active_session);
-        self.room_to_session.insert(room_id.clone(), session_id.clone());
+        self.room_to_session
+            .insert(room_id.clone(), session_id.clone());
 
         info!(
             %session_id,
@@ -117,7 +121,9 @@ impl RecordingManager {
 
     /// Queries the current lifecycle status of a session.
     pub fn status(&self, session_id: &str) -> Option<RecordingStatus> {
-        self.sessions.get(session_id).map(|s| s.status.read().clone())
+        self.sessions
+            .get(session_id)
+            .map(|s| s.status.read().clone())
     }
 
     /// Checks if a room currently has an active recording session.
@@ -127,7 +133,9 @@ impl RecordingManager {
 
     /// Extracts the packet receiver stream for asynchronous process piping (e.g. FFmpeg supervisor).
     pub fn take_receiver(&self, session_id: &str) -> Option<mpsc::Receiver<AlvioRtpPacket>> {
-        self.sessions.get(session_id).and_then(|s| s.receiver.lock().take())
+        self.sessions
+            .get(session_id)
+            .and_then(|s| s.receiver.lock().take())
     }
 
     pub fn storage(&self) -> &Arc<dyn StorageBackend> {
@@ -193,7 +201,10 @@ mod tests {
         }
 
         // Check active status
-        assert!(matches!(manager.status(&session_id), Some(RecordingStatus::Active { .. })));
+        assert!(matches!(
+            manager.status(&session_id),
+            Some(RecordingStatus::Active { .. })
+        ));
 
         // Stop recording
         let output = manager.stop_recording(&session_id).unwrap();

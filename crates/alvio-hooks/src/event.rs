@@ -97,12 +97,7 @@ impl WebhookEvent {
         )
     }
 
-    pub fn peer_left(
-        room_id: &RoomId,
-        peer_id: &PeerId,
-        duration_secs: u64,
-        reason: &str,
-    ) -> Self {
+    pub fn peer_left(room_id: &RoomId, peer_id: &PeerId, duration_secs: u64, reason: &str) -> Self {
         Self::new(
             WebhookEventType::PeerLeft,
             json!({
@@ -131,11 +126,7 @@ impl WebhookEvent {
         )
     }
 
-    pub fn track_unpublished(
-        room_id: &RoomId,
-        peer_id: &PeerId,
-        track_id: &TrackId,
-    ) -> Self {
+    pub fn track_unpublished(room_id: &RoomId, peer_id: &PeerId, track_id: &TrackId) -> Self {
         Self::new(
             WebhookEventType::TrackUnpublished,
             json!({
@@ -146,11 +137,7 @@ impl WebhookEvent {
         )
     }
 
-    pub fn recording_started(
-        session_id: &str,
-        room_id: &RoomId,
-        destination_path: &str,
-    ) -> Self {
+    pub fn recording_started(session_id: &str, room_id: &RoomId, destination_path: &str) -> Self {
         Self::new(
             WebhookEventType::RecordingStarted,
             json!({

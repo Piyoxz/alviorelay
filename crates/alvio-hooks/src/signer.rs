@@ -58,8 +58,7 @@ impl WebhookSigner {
             .strip_prefix("sha256=")
             .unwrap_or(signature_header);
 
-        let sig_bytes = hex::decode(sig_hex)
-            .map_err(|_| WebhookError::InvalidSignature)?;
+        let sig_bytes = hex::decode(sig_hex).map_err(|_| WebhookError::InvalidSignature)?;
 
         let mut mac = HmacSha256::new_from_slice(self.secret.as_bytes())
             .map_err(|e| WebhookError::SigningError(e.to_string()))?;
@@ -89,7 +88,9 @@ mod tests {
         assert!(signature.starts_with("sha256="));
 
         // Valid signature passes verification
-        let is_valid = signer.verify(timestamp, payload, &signature, Some(300)).unwrap();
+        let is_valid = signer
+            .verify(timestamp, payload, &signature, Some(300))
+            .unwrap();
         assert!(is_valid);
 
         // Tampered payload fails verification

@@ -1,7 +1,7 @@
-use async_trait::async_trait;
-use alvio_protocol::SignalEnvelope;
-use tokio::sync::mpsc;
 use crate::error::ClientError;
+use alvio_protocol::SignalEnvelope;
+use async_trait::async_trait;
+use tokio::sync::mpsc;
 
 /// Asynchronous transport abstraction for client signaling communication.
 #[async_trait]

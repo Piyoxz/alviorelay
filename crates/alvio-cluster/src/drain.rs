@@ -66,12 +66,18 @@ impl DrainController {
 
             if let Some(t) = timeout {
                 if start.elapsed() >= t {
-                    warn!(active_rooms = active, "Drain timeout exceeded before room count reached zero");
+                    warn!(
+                        active_rooms = active,
+                        "Drain timeout exceeded before room count reached zero"
+                    );
                     return Err(ClusterError::DrainTimeout(t.as_secs()));
                 }
             }
 
-            info!(active_rooms = active, "Drain in progress: waiting for active rooms to conclude...");
+            info!(
+                active_rooms = active,
+                "Drain in progress: waiting for active rooms to conclude..."
+            );
             tokio::time::sleep(poll_interval).await;
         }
     }

@@ -1,10 +1,10 @@
-use std::sync::Arc;
 use alvio_core::{PeerId, StreamKind, StreamLayer, TrackId};
 use alvio_sfu::data::DataMessage;
 use alvio_sfu::{DataRouter, NackBuffer, RtpRouter, StreamConsumer, StreamSource};
 use alvio_webrtc::{AlvioRtpPacket, RtpHeader};
 use bytes::Bytes;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use std::sync::Arc;
 
 fn make_sample_packet(ssrc: u32, seq: u16, timestamp: u32) -> AlvioRtpPacket {
     let header = RtpHeader {

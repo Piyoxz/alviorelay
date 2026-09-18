@@ -33,6 +33,9 @@ mod tests {
         assert!(err.to_string().contains("node-us-east-1"));
 
         let no_nodes = ClusterError::NoHealthyNodes;
-        assert_eq!(no_nodes.to_string(), "No healthy active nodes available in the cluster");
+        assert_eq!(
+            no_nodes.to_string(),
+            "No healthy active nodes available in the cluster"
+        );
     }
 }

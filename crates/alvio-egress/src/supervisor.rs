@@ -39,26 +39,36 @@ impl FfmpegCommandBuilder {
         match format {
             OutputFormat::Mp4 => {
                 args.extend([
-                    "-c:v".to_string(), "copy".to_string(),
-                    "-c:a".to_string(), "aac".to_string(),
-                    "-movflags".to_string(), "+faststart".to_string(),
+                    "-c:v".to_string(),
+                    "copy".to_string(),
+                    "-c:a".to_string(),
+                    "aac".to_string(),
+                    "-movflags".to_string(),
+                    "+faststart".to_string(),
                     output_path.to_string(),
                 ]);
             }
             OutputFormat::WebM => {
                 args.extend([
-                    "-c:v".to_string(), "copy".to_string(),
-                    "-c:a".to_string(), "libopus".to_string(),
+                    "-c:v".to_string(),
+                    "copy".to_string(),
+                    "-c:a".to_string(),
+                    "libopus".to_string(),
                     output_path.to_string(),
                 ]);
             }
             OutputFormat::Hls => {
                 args.extend([
-                    "-c:v".to_string(), "copy".to_string(),
-                    "-c:a".to_string(), "aac".to_string(),
-                    "-f".to_string(), "hls".to_string(),
-                    "-hls_time".to_string(), "4".to_string(),
-                    "-hls_list_size".to_string(), "0".to_string(),
+                    "-c:v".to_string(),
+                    "copy".to_string(),
+                    "-c:a".to_string(),
+                    "aac".to_string(),
+                    "-f".to_string(),
+                    "hls".to_string(),
+                    "-hls_time".to_string(),
+                    "4".to_string(),
+                    "-hls_list_size".to_string(),
+                    "0".to_string(),
                     output_path.to_string(),
                 ]);
             }

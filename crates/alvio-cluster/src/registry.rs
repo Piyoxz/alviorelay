@@ -44,7 +44,9 @@ impl ClusterRegistry {
 
     /// Looks up a specific node by its identifier.
     pub fn get(&self, node_id: &str) -> Option<Arc<ClusterNode>> {
-        self.nodes.get(node_id).map(|entry| Arc::clone(entry.value()))
+        self.nodes
+            .get(node_id)
+            .map(|entry| Arc::clone(entry.value()))
     }
 
     /// Deterministically locates the authoritative node responsible for the given `RoomId`.
@@ -75,8 +77,20 @@ mod tests {
     #[test]
     fn test_cluster_registry_registration_and_lookup() {
         let registry = ClusterRegistry::default();
-        let node1 = ClusterNode::new("node-alpha", "http://alpha:7880", "alpha:7882", "us-west", 100);
-        let node2 = ClusterNode::new("node-beta", "http://beta:7880", "beta:7882", "eu-central", 100);
+        let node1 = ClusterNode::new(
+            "node-alpha",
+            "http://alpha:7880",
+            "alpha:7882",
+            "us-west",
+            100,
+        );
+        let node2 = ClusterNode::new(
+            "node-beta",
+            "http://beta:7880",
+            "beta:7882",
+            "eu-central",
+            100,
+        );
 
         registry.register(node1).unwrap();
         registry.register(node2).unwrap();

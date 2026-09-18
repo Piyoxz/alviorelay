@@ -8,10 +8,7 @@ use axum::{
 use serde_json::json;
 
 pub fn create_signaling_router(registry: RoomRegistry, node_id: String) -> Router {
-    let state = SignalState {
-        registry,
-        node_id,
-    };
+    let state = SignalState { registry, node_id };
 
     Router::new()
         .route("/", get(root_handler))
@@ -22,7 +19,8 @@ pub fn create_signaling_router(registry: RoomRegistry, node_id: String) -> Route
 }
 
 async fn root_handler() -> Html<&'static str> {
-    Html(r#"<!DOCTYPE html>
+    Html(
+        r#"<!DOCTYPE html>
 <html>
 <head><title>AlvioRelay Media Server</title></head>
 <body style="font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 90vh;">
@@ -33,7 +31,8 @@ async fn root_handler() -> Html<&'static str> {
     <p style="font-size: 0.85rem; color: #64748b; margin-top: 1.5rem;">Connect via WebSocket at <code>/ws</code> or broadcast via WHIP at <code>/whip/{room_id}</code></p>
   </div>
 </body>
-</html>"#)
+</html>"#,
+    )
 }
 
 async fn health_handler() -> impl IntoResponse {

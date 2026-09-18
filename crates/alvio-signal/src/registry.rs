@@ -74,10 +74,7 @@ impl RoomSession {
         self.peers.insert(peer.id.clone(), peer);
 
         let sender_id = info.id.clone();
-        self.broadcast(
-            Some(&sender_id),
-            SignalMessage::PeerJoined { peer: info },
-        );
+        self.broadcast(Some(&sender_id), SignalMessage::PeerJoined { peer: info });
 
         Ok(())
     }
@@ -116,10 +113,7 @@ impl RoomSession {
     pub fn publish_track(&self, track: TrackInfo) {
         self.tracks.insert(track.id.clone(), track.clone());
         let publisher_id = track.peer_id.clone();
-        self.broadcast(
-            Some(&publisher_id),
-            SignalMessage::TrackPublished { track },
-        );
+        self.broadcast(Some(&publisher_id), SignalMessage::TrackPublished { track });
     }
 
     /// Remove a published track from this room.
@@ -151,7 +145,12 @@ impl RoomSession {
     }
 
     /// Sends a direct data message to targeted peers.
-    pub fn send_direct_data(&self, source_peer_id: &PeerId, destination_peer_ids: &[PeerId], payload: &str) {
+    pub fn send_direct_data(
+        &self,
+        source_peer_id: &PeerId,
+        destination_peer_ids: &[PeerId],
+        payload: &str,
+    ) {
         let msg = SignalMessage::DataReceived {
             source_peer_id: source_peer_id.clone(),
             payload: payload.to_string(),

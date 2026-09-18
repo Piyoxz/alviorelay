@@ -1,15 +1,31 @@
-use alvio_cluster::{
-    ClusterNode, ClusterRegistry, DrainController, NodeStatus,
-};
+use alvio_cluster::{ClusterNode, ClusterRegistry, DrainController, NodeStatus};
 use alvio_core::RoomId;
 
 #[test]
 fn test_multi_node_authoritative_routing() {
     let registry = ClusterRegistry::default();
 
-    let node_us = ClusterNode::new("edge-us-1", "http://us1.alvio.io:7880", "us1.alvio.io:7882", "us-east", 500);
-    let node_eu = ClusterNode::new("edge-eu-1", "http://eu1.alvio.io:7880", "eu1.alvio.io:7882", "eu-west", 500);
-    let node_ap = ClusterNode::new("edge-ap-1", "http://ap1.alvio.io:7880", "ap1.alvio.io:7882", "ap-southeast", 500);
+    let node_us = ClusterNode::new(
+        "edge-us-1",
+        "http://us1.alvio.io:7880",
+        "us1.alvio.io:7882",
+        "us-east",
+        500,
+    );
+    let node_eu = ClusterNode::new(
+        "edge-eu-1",
+        "http://eu1.alvio.io:7880",
+        "eu1.alvio.io:7882",
+        "eu-west",
+        500,
+    );
+    let node_ap = ClusterNode::new(
+        "edge-ap-1",
+        "http://ap1.alvio.io:7880",
+        "ap1.alvio.io:7882",
+        "ap-southeast",
+        500,
+    );
 
     registry.register(node_us).unwrap();
     registry.register(node_eu).unwrap();
@@ -35,8 +51,20 @@ fn test_multi_node_authoritative_routing() {
 fn test_node_drain_and_failover() {
     let registry = ClusterRegistry::default();
 
-    let node_a = ClusterNode::new("node-alpha", "http://alpha:7880", "alpha:7882", "us-east", 100);
-    let node_b = ClusterNode::new("node-bravo", "http://bravo:7880", "bravo:7882", "us-east", 100);
+    let node_a = ClusterNode::new(
+        "node-alpha",
+        "http://alpha:7880",
+        "alpha:7882",
+        "us-east",
+        100,
+    );
+    let node_b = ClusterNode::new(
+        "node-bravo",
+        "http://bravo:7880",
+        "bravo:7882",
+        "us-east",
+        100,
+    );
 
     registry.register(node_a).unwrap();
     registry.register(node_b).unwrap();
@@ -72,5 +100,8 @@ fn test_drain_controller_toggling() {
     assert!(!drain.can_accept_new_room());
 
     let second_transition = drain.start_drain();
-    assert!(!second_transition, "Should return false if already in drain state");
+    assert!(
+        !second_transition,
+        "Should return false if already in drain state"
+    );
 }

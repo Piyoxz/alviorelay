@@ -59,7 +59,9 @@ impl WebhookDispatcher {
                 .unwrap_or_else(|_| reqwest::Client::new());
 
             while let Some(event) = rx.recv().await {
-                worker_metrics.events_dispatched.fetch_add(1, Ordering::Relaxed);
+                worker_metrics
+                    .events_dispatched
+                    .fetch_add(1, Ordering::Relaxed);
                 let payload_bytes = match serde_json::to_vec(&event) {
                     Ok(bytes) => bytes,
                     Err(e) => {
@@ -69,7 +71,9 @@ impl WebhookDispatcher {
                     }
                 };
 
-                let signature = signer.as_ref().and_then(|s| s.sign(event.timestamp, &payload_bytes).ok());
+                let signature = signer
+                    .as_ref()
+                    .and_then(|s| s.sign(event.timestamp, &payload_bytes).ok());
 
                 let mut delivered = false;
                 for attempt in 0..Self::MAX_RETRIES {
@@ -94,7 +98,9 @@ impl WebhookDispatcher {
                                     attempt,
                                     "Webhook delivered successfully"
                                 );
-                                worker_metrics.events_delivered.fetch_add(1, Ordering::Relaxed);
+                                worker_metrics
+                                    .events_delivered
+                                    .fetch_add(1, Ordering::Relaxed);
                                 delivered = true;
                                 break;
                             } else if resp.status().is_client_error() {
@@ -167,7 +173,9 @@ impl WebhookDispatcher {
             }
             Err(mpsc::error::TrySendError::Closed(_)) => {
                 self.metrics.events_failed.fetch_add(1, Ordering::Relaxed);
-                Err(WebhookError::DeliveryFailed("Worker channel closed".to_string()))
+                Err(WebhookError::DeliveryFailed(
+                    "Worker channel closed".to_string(),
+                ))
             }
         }
     }

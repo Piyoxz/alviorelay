@@ -66,7 +66,11 @@ impl RtpRouter {
 
     /// Attaches a new consumer subscription to a stream source.
     pub fn add_consumer(&self, source_ssrc: u32, consumer: Arc<StreamConsumer>) {
-        let primary_ssrc = self.ssrc_to_primary.get(&source_ssrc).map(|r| *r).unwrap_or(source_ssrc);
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&source_ssrc)
+            .map(|r| *r)
+            .unwrap_or(source_ssrc);
         debug!(
             primary_ssrc,
             target_ssrc = consumer.target_ssrc,
@@ -81,15 +85,28 @@ impl RtpRouter {
 
     /// Removes a consumer subscription.
     pub fn remove_consumer(&self, source_ssrc: u32, consumer_id: &str) {
-        let primary_ssrc = self.ssrc_to_primary.get(&source_ssrc).map(|r| *r).unwrap_or(source_ssrc);
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&source_ssrc)
+            .map(|r| *r)
+            .unwrap_or(source_ssrc);
         if let Some(mut list) = self.consumers.get_mut(&primary_ssrc) {
             list.retain(|c| c.consumer_id != consumer_id);
         }
     }
 
     /// Requests a dynamic Simulcast layer switch for a specific consumer.
-    pub fn switch_consumer_layer(&self, source_ssrc: u32, consumer_id: &str, target_layer: StreamLayer) -> bool {
-        let primary_ssrc = self.ssrc_to_primary.get(&source_ssrc).map(|r| *r).unwrap_or(source_ssrc);
+    pub fn switch_consumer_layer(
+        &self,
+        source_ssrc: u32,
+        consumer_id: &str,
+        target_layer: StreamLayer,
+    ) -> bool {
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&source_ssrc)
+            .map(|r| *r)
+            .unwrap_or(source_ssrc);
         if let Some(consumer_list) = self.consumers.get(&primary_ssrc) {
             for consumer in consumer_list.iter() {
                 if consumer.consumer_id == consumer_id {
@@ -107,17 +124,27 @@ impl RtpRouter {
     }
 
     /// Routes an incoming RTP packet with explicit keyframe signaling for synchronized layer switching.
-    pub fn route_packet_with_keyframe(&self, packet: &AlvioRtpPacket, is_keyframe: bool) -> Vec<AlvioRtpPacket> {
+    pub fn route_packet_with_keyframe(
+        &self,
+        packet: &AlvioRtpPacket,
+        is_keyframe: bool,
+    ) -> Vec<AlvioRtpPacket> {
         let packet_ssrc = packet.header.ssrc;
 
         if let Some(buffer) = self.nack_buffers.get(&packet_ssrc) {
             buffer.put(packet.clone());
         }
 
-        let primary_ssrc = self.ssrc_to_primary.get(&packet_ssrc).map(|r| *r).unwrap_or(packet_ssrc);
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&packet_ssrc)
+            .map(|r| *r)
+            .unwrap_or(packet_ssrc);
 
         let packet_layer = if let Some(source) = self.sources.get(&primary_ssrc) {
-            source.layer_for_ssrc(packet_ssrc).unwrap_or(StreamLayer::High)
+            source
+                .layer_for_ssrc(packet_ssrc)
+                .unwrap_or(StreamLayer::High)
         } else {
             StreamLayer::High
         };
@@ -147,8 +174,13 @@ impl RtpRouter {
 
     /// Evaluates keyframe request (PLI/FIR) with rate limiting against keyframe storms.
     pub fn request_keyframe(&self, source_ssrc: u32, kind: KeyframeKind, now: Instant) -> bool {
-        let primary_ssrc = self.ssrc_to_primary.get(&source_ssrc).map(|r| *r).unwrap_or(source_ssrc);
-        self.keyframe_controller.request_keyframe(primary_ssrc, kind, now)
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&source_ssrc)
+            .map(|r| *r)
+            .unwrap_or(source_ssrc);
+        self.keyframe_controller
+            .request_keyframe(primary_ssrc, kind, now)
     }
 
     pub fn nack_buffer(&self, source_ssrc: u32) -> Option<Arc<NackBuffer>> {
@@ -160,7 +192,11 @@ impl RtpRouter {
     }
 
     pub fn consumer_count(&self, source_ssrc: u32) -> usize {
-        let primary_ssrc = self.ssrc_to_primary.get(&source_ssrc).map(|r| *r).unwrap_or(source_ssrc);
+        let primary_ssrc = self
+            .ssrc_to_primary
+            .get(&source_ssrc)
+            .map(|r| *r)
+            .unwrap_or(source_ssrc);
         self.consumers.get(&primary_ssrc).map_or(0, |c| c.len())
     }
 }
@@ -215,9 +251,8 @@ mod tests {
 
         // Simulate incoming packet from Alice (sequence number 1)
         let raw_packet = vec![
-            0x80, 0x60, 0x00, 0x01,
-            0x00, 0x01, 0x5F, 0x90,
-            0x11, 0x11, 0x22, 0x22, // Alice SSRC
+            0x80, 0x60, 0x00, 0x01, 0x00, 0x01, 0x5F, 0x90, 0x11, 0x11, 0x22,
+            0x22, // Alice SSRC
             0xAA, 0xBB, 0xCC, 0xDD,
         ];
         let packet = AlvioRtpPacket::parse(Bytes::from(raw_packet)).unwrap();
@@ -238,10 +273,7 @@ mod tests {
 
         // Next packet from Alice (sequence number 2)
         let raw_packet2 = vec![
-            0x80, 0x60, 0x00, 0x02,
-            0x00, 0x01, 0x60, 0x00,
-            0x11, 0x11, 0x22, 0x22,
-            0xEE, 0xFF,
+            0x80, 0x60, 0x00, 0x02, 0x00, 0x01, 0x60, 0x00, 0x11, 0x11, 0x22, 0x22, 0xEE, 0xFF,
         ];
         let packet2 = AlvioRtpPacket::parse(Bytes::from(raw_packet2)).unwrap();
         let routed2 = router.route_packet(&packet2);
@@ -261,6 +293,10 @@ mod tests {
         let now = Instant::now();
         assert!(router.request_keyframe(source_ssrc, KeyframeKind::Pli, now));
         // Second immediate call throttled
-        assert!(!router.request_keyframe(source_ssrc, KeyframeKind::Pli, now + Duration::from_millis(50)));
+        assert!(!router.request_keyframe(
+            source_ssrc,
+            KeyframeKind::Pli,
+            now + Duration::from_millis(50)
+        ));
     }
 }

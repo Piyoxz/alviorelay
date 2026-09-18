@@ -40,10 +40,8 @@ impl PlacementStrategy for ConsistentHashPlacement {
         room_id: &RoomId,
         candidates: &'a [Arc<ClusterNode>],
     ) -> ClusterResult<&'a Arc<ClusterNode>> {
-        let available: Vec<&Arc<ClusterNode>> = candidates
-            .iter()
-            .filter(|n| n.is_available())
-            .collect();
+        let available: Vec<&Arc<ClusterNode>> =
+            candidates.iter().filter(|n| n.is_available()).collect();
 
         if available.is_empty() {
             return Err(ClusterError::NoHealthyNodes);
@@ -77,10 +75,8 @@ impl PlacementStrategy for LeastLoadedPlacement {
         _room_id: &RoomId,
         candidates: &'a [Arc<ClusterNode>],
     ) -> ClusterResult<&'a Arc<ClusterNode>> {
-        let available: Vec<&Arc<ClusterNode>> = candidates
-            .iter()
-            .filter(|n| n.is_available())
-            .collect();
+        let available: Vec<&Arc<ClusterNode>> =
+            candidates.iter().filter(|n| n.is_available()).collect();
 
         if available.is_empty() {
             return Err(ClusterError::NoHealthyNodes);
@@ -107,9 +103,27 @@ mod tests {
 
     #[test]
     fn test_consistent_hash_deterministic_placement() {
-        let node1 = Arc::new(ClusterNode::new("node-1", "http://node1:7880", "node1:7882", "us-east", 100));
-        let node2 = Arc::new(ClusterNode::new("node-2", "http://node2:7880", "node2:7882", "us-east", 100));
-        let node3 = Arc::new(ClusterNode::new("node-3", "http://node3:7880", "node3:7882", "us-east", 100));
+        let node1 = Arc::new(ClusterNode::new(
+            "node-1",
+            "http://node1:7880",
+            "node1:7882",
+            "us-east",
+            100,
+        ));
+        let node2 = Arc::new(ClusterNode::new(
+            "node-2",
+            "http://node2:7880",
+            "node2:7882",
+            "us-east",
+            100,
+        ));
+        let node3 = Arc::new(ClusterNode::new(
+            "node-3",
+            "http://node3:7880",
+            "node3:7882",
+            "us-east",
+            100,
+        ));
         let candidates = vec![node1.clone(), node2.clone(), node3.clone()];
 
         let strategy = ConsistentHashPlacement::new();
@@ -134,8 +148,20 @@ mod tests {
 
     #[test]
     fn test_least_loaded_placement() {
-        let node1 = Arc::new(ClusterNode::new("node-1", "http://node1:7880", "node1:7882", "us-east", 100));
-        let node2 = Arc::new(ClusterNode::new("node-2", "http://node2:7880", "node2:7882", "us-east", 100));
+        let node1 = Arc::new(ClusterNode::new(
+            "node-1",
+            "http://node1:7880",
+            "node1:7882",
+            "us-east",
+            100,
+        ));
+        let node2 = Arc::new(ClusterNode::new(
+            "node-2",
+            "http://node2:7880",
+            "node2:7882",
+            "us-east",
+            100,
+        ));
         node1.active_rooms.store(80, Ordering::Relaxed);
         node2.active_rooms.store(10, Ordering::Relaxed);
 
@@ -144,6 +170,9 @@ mod tests {
 
         let room = RoomId::from("new-room");
         let selected = strategy.select_node(&room, &candidates).unwrap();
-        assert_eq!(selected.id, "node-2", "Must pick the node with lowest load factor");
+        assert_eq!(
+            selected.id, "node-2",
+            "Must pick the node with lowest load factor"
+        );
     }
 }

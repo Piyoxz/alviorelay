@@ -40,7 +40,10 @@ impl WhipState {
 
 /// Helper function to attach standard CORS headers to WHIP responses.
 fn add_cors_headers(headers: &mut HeaderMap) {
-    headers.insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"));
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_ORIGIN,
+        HeaderValue::from_static("*"),
+    );
     headers.insert(
         header::ACCESS_CONTROL_ALLOW_METHODS,
         HeaderValue::from_static("POST, DELETE, PATCH, OPTIONS"),
@@ -59,8 +62,14 @@ fn add_cors_headers(headers: &mut HeaderMap) {
 pub async fn whip_options_handler() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     add_cors_headers(&mut headers);
-    headers.insert(header::ALLOW, HeaderValue::from_static("POST, DELETE, PATCH, OPTIONS"));
-    headers.insert(header::HeaderName::from_static("accept-post"), HeaderValue::from_static("application/sdp"));
+    headers.insert(
+        header::ALLOW,
+        HeaderValue::from_static("POST, DELETE, PATCH, OPTIONS"),
+    );
+    headers.insert(
+        header::HeaderName::from_static("accept-post"),
+        HeaderValue::from_static("application/sdp"),
+    );
     headers.insert(
         header::HeaderName::from_static("accept-patch"),
         HeaderValue::from_static("application/trickle-ice-sdpfrag"),
@@ -82,7 +91,9 @@ pub async fn whip_publish_handler(
             return Err(IngressError::UnsupportedContentType(ct.to_string()));
         }
     } else {
-        return Err(IngressError::UnsupportedContentType("missing Content-Type".to_string()));
+        return Err(IngressError::UnsupportedContentType(
+            "missing Content-Type".to_string(),
+        ));
     }
 
     // 2. Validate Authentication (if enabled)
@@ -109,7 +120,9 @@ pub async fn whip_publish_handler(
     // 3. Validate SDP Offer
     let sdp_trimmed = sdp_offer.trim();
     if sdp_trimmed.is_empty() {
-        return Err(IngressError::InvalidSdp("SDP offer cannot be empty".to_string()));
+        return Err(IngressError::InvalidSdp(
+            "SDP offer cannot be empty".to_string(),
+        ));
     }
 
     let room_id = RoomId::from(room_id_str.clone());
@@ -157,14 +170,20 @@ pub async fn whip_publish_handler(
     // 7. Format WHIP 201 Created HTTP Response
     let mut resp_headers = HeaderMap::new();
     add_cors_headers(&mut resp_headers);
-    resp_headers.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/sdp"));
+    resp_headers.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("application/sdp"),
+    );
 
     let resource_url = format!("/whip/resource/{}", session.resource_id);
     if let Ok(loc_val) = HeaderValue::from_str(&resource_url) {
         resp_headers.insert(header::LOCATION, loc_val);
     }
 
-    let link_hdr = format!("<{}>; rel=\"urn:ietf:params:whip:resource-url\"", resource_url);
+    let link_hdr = format!(
+        "<{}>; rel=\"urn:ietf:params:whip:resource-url\"",
+        resource_url
+    );
     if let Ok(link_val) = HeaderValue::from_str(&link_hdr) {
         resp_headers.insert(header::LINK, link_val);
     }
@@ -188,7 +207,10 @@ pub async fn whip_delete_handler(
 
     // Disconnect peer from signaling room registry
     if let Some(room) = state.room_registry.get(&session.room_id) {
-        room.leave_peer(&session.peer_id, "WHIP publishing session terminated via DELETE");
+        room.leave_peer(
+            &session.peer_id,
+            "WHIP publishing session terminated via DELETE",
+        );
     }
 
     info!(
@@ -213,7 +235,9 @@ pub async fn whip_patch_handler(
     // 1. Verify Content-Type
     if let Some(ct) = headers.get(header::CONTENT_TYPE) {
         let ct_str = ct.to_str().unwrap_or_default();
-        if !ct_str.starts_with("application/trickle-ice-sdpfrag") && !ct_str.starts_with("text/plain") {
+        if !ct_str.starts_with("application/trickle-ice-sdpfrag")
+            && !ct_str.starts_with("text/plain")
+        {
             return Err(IngressError::UnsupportedContentType(ct_str.to_string()));
         }
     }

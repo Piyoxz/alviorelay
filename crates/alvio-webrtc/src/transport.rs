@@ -47,9 +47,7 @@ pub enum AlvioTransportOutput {
     /// Incoming data packet from remote peer on a DataChannel.
     DataChannelData(AlvioDataPacket),
     /// DataChannel closed.
-    DataChannelClose {
-        channel_id: ChannelId,
-    },
+    DataChannelClose { channel_id: ChannelId },
     /// Next deadline when `handle_timeout` should be invoked.
     Timeout(Instant),
 }
@@ -64,9 +62,7 @@ pub struct AlvioTransport {
 
 impl AlvioTransport {
     pub fn new(local_addr: SocketAddr) -> AlvioResult<Self> {
-        let mut rtc = Rtc::builder()
-            .set_rtp_mode(true)
-            .build(Instant::now());
+        let mut rtc = Rtc::builder().set_rtp_mode(true).build(Instant::now());
 
         let candidate = Candidate::host(local_addr, "udp")
             .map_err(|e| AlvioError::Transport(format!("Failed to create host candidate: {e}")))?;
@@ -92,7 +88,10 @@ impl AlvioTransport {
             .map_err(|e| AlvioError::Transport(format!("Failed to accept SDP offer: {e}")))?;
 
         let answer_sdp = answer.to_sdp_string();
-        info!("Accepted remote SDP offer, generated SDP answer (len={})", answer_sdp.len());
+        info!(
+            "Accepted remote SDP offer, generated SDP answer (len={})",
+            answer_sdp.len()
+        );
         Ok(answer_sdp)
     }
 
@@ -147,9 +146,9 @@ impl AlvioTransport {
             proto: Protocol::Udp,
             source,
             destination: self.local_addr,
-            contents: data
-                .try_into()
-                .map_err(|_| AlvioError::Transport("UDP packet exceeds max MTU size".to_string()))?,
+            contents: data.try_into().map_err(|_| {
+                AlvioError::Transport("UDP packet exceeds max MTU size".to_string())
+            })?,
         };
 
         self.rtc
@@ -231,7 +230,9 @@ impl AlvioTransport {
                 Event::ChannelClose(id) => {
                     debug!(?id, "WebRTC DataChannel closed");
                     self.channel_labels.remove(&id);
-                    Ok(Some(AlvioTransportOutput::DataChannelClose { channel_id: id }))
+                    Ok(Some(AlvioTransportOutput::DataChannelClose {
+                        channel_id: id,
+                    }))
                 }
                 Event::RtpPacket(rtp) => {
                     let packet = AlvioRtpPacket {
@@ -254,7 +255,9 @@ impl AlvioTransport {
             },
             Err(e) => {
                 warn!("WebRTC poll_output error: {:?}", e);
-                Err(AlvioError::Transport(format!("WebRTC poll_output error: {e}")))
+                Err(AlvioError::Transport(format!(
+                    "WebRTC poll_output error: {e}"
+                )))
             }
         }
     }

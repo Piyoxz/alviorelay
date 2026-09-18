@@ -3,8 +3,10 @@ use serde::{Deserialize, Serialize};
 /// Represents the connection lifecycle state of the client.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[derive(Default)]
 pub enum ConnectionState {
     /// Client is disconnected and idle.
+    #[default]
     Disconnected,
     /// Client is establishing signaling/peer connection.
     Connecting,
@@ -16,10 +18,4 @@ pub enum ConnectionState {
     Reconnecting,
     /// Terminal failure state.
     Failed,
-}
-
-impl Default for ConnectionState {
-    fn default() -> Self {
-        Self::Disconnected
-    }
 }

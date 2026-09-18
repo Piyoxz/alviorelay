@@ -63,7 +63,10 @@ async fn mock_webhook_handler(
         .verify(timestamp, &body, &signature, Some(60))
         .unwrap_or(false);
 
-    assert!(is_valid, "HMAC-SHA256 signature must be cryptographically valid");
+    assert!(
+        is_valid,
+        "HMAC-SHA256 signature must be cryptographically valid"
+    );
 
     state.received.lock().await.push(ReceivedPayload {
         event_id,
@@ -118,7 +121,12 @@ async fn test_webhook_dispatch_and_hmac_verification() {
         .unwrap();
 
     dispatcher
-        .dispatch(WebhookEvent::peer_joined(&room_id, &peer_id, "Bob", Some("presenter")))
+        .dispatch(WebhookEvent::peer_joined(
+            &room_id,
+            &peer_id,
+            "Bob",
+            Some("presenter"),
+        ))
         .unwrap();
 
     // Allow background worker to deliver
@@ -137,7 +145,13 @@ async fn test_webhook_dispatch_and_hmac_verification() {
     assert_eq!(second_json["event"], "peer_joined");
     assert_eq!(second_json["payload"]["peer_id"], "speaker-bob");
 
-    assert_eq!(dispatcher.metrics().events_delivered.load(Ordering::Relaxed), 2);
+    assert_eq!(
+        dispatcher
+            .metrics()
+            .events_delivered
+            .load(Ordering::Relaxed),
+        2
+    );
     assert!(items[0].event_id.starts_with("evt_"));
     assert!(items[0].timestamp > 0);
     assert!(items[0].signature.starts_with("sha256="));
@@ -187,5 +201,11 @@ async fn test_webhook_retry_on_transient_failure() {
 
     let items = received_store.lock().await;
     assert_eq!(items.len(), 1, "Should have succeeded after retry");
-    assert_eq!(dispatcher.metrics().events_delivered.load(Ordering::Relaxed), 1);
+    assert_eq!(
+        dispatcher
+            .metrics()
+            .events_delivered
+            .load(Ordering::Relaxed),
+        1
+    );
 }

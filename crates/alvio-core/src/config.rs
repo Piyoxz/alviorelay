@@ -5,7 +5,7 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AlvioConfig {
     #[serde(default)]
     pub server: ServerConfig,
@@ -19,19 +19,6 @@ pub struct AlvioConfig {
     pub egress: EgressConfig,
     #[serde(default)]
     pub webhooks: WebhooksConfig,
-}
-
-impl Default for AlvioConfig {
-    fn default() -> Self {
-        Self {
-            server: ServerConfig::default(),
-            rtc: RtcConfig::default(),
-            room: RoomConfig::default(),
-            auth: AuthConfig::default(),
-            egress: EgressConfig::default(),
-            webhooks: WebhooksConfig::default(),
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -192,22 +179,12 @@ fn default_storage_dir() -> String {
     "./recordings".to_string()
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct WebhooksConfig {
     #[serde(default)]
     pub enabled: bool,
     pub endpoint_url: Option<String>,
     pub secret: Option<String>,
-}
-
-impl Default for WebhooksConfig {
-    fn default() -> Self {
-        Self {
-            enabled: false,
-            endpoint_url: None,
-            secret: None,
-        }
-    }
 }
 
 impl AlvioConfig {

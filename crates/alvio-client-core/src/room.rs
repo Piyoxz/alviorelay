@@ -1,8 +1,8 @@
-use std::collections::HashMap;
-use std::sync::Arc;
 use alvio_core::{PeerId, RoomId, StreamKind, StreamLayer, TrackId};
 use alvio_protocol::{PeerInfo, SignalEnvelope, SignalMessage, TrackInfo};
 use parking_lot::RwLock;
+use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::sync::{broadcast, mpsc};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info, warn};
@@ -308,7 +308,10 @@ impl ClientRoom {
     ) {
         match msg {
             SignalMessage::Ack { peer_id, node_id } => {
-                info!("Connected and acknowledged by node {} as {}", node_id, peer_id);
+                info!(
+                    "Connected and acknowledged by node {} as {}",
+                    node_id, peer_id
+                );
                 *self_peer_id_lock.write() = Some(peer_id.clone());
                 *state_lock.write() = ConnectionState::Connected;
                 let _ = event_tx.send(ClientEvent::StateChanged(ConnectionState::Connected));

@@ -1,5 +1,7 @@
 use alvio_core::{PeerId, StreamKind, StreamLayer, TrackId};
-use alvio_sfu::{BweController, KeyframeKind, NackGenerator, RtpRouter, StreamConsumer, StreamSource};
+use alvio_sfu::{
+    BweController, KeyframeKind, NackGenerator, RtpRouter, StreamConsumer, StreamSource,
+};
 use alvio_webrtc::{AlvioRtpPacket, RtpHeader};
 use bytes::Bytes;
 use std::sync::Arc;
@@ -105,10 +107,26 @@ fn test_sfu_keyframe_storm_protection() {
 
     // 5 subscribers join almost at the same time and request PLI
     let p1 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start);
-    let p2 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start + Duration::from_millis(10));
-    let p3 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start + Duration::from_millis(50));
-    let p4 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start + Duration::from_millis(100));
-    let p5 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start + Duration::from_millis(200));
+    let p2 = router.request_keyframe(
+        source_ssrc,
+        KeyframeKind::Pli,
+        start + Duration::from_millis(10),
+    );
+    let p3 = router.request_keyframe(
+        source_ssrc,
+        KeyframeKind::Pli,
+        start + Duration::from_millis(50),
+    );
+    let p4 = router.request_keyframe(
+        source_ssrc,
+        KeyframeKind::Pli,
+        start + Duration::from_millis(100),
+    );
+    let p5 = router.request_keyframe(
+        source_ssrc,
+        KeyframeKind::Pli,
+        start + Duration::from_millis(200),
+    );
 
     // Only the first one is dispatched upstream; the other 4 are coalesced/throttled!
     assert!(p1, "First PLI must be forwarded to publisher");
@@ -118,7 +136,11 @@ fn test_sfu_keyframe_storm_protection() {
     assert!(!p5, "Subsequent rapid PLIs must be suppressed");
 
     // After default cooldown (500ms), next PLI is allowed through
-    let p6 = router.request_keyframe(source_ssrc, KeyframeKind::Pli, start + Duration::from_millis(550));
+    let p6 = router.request_keyframe(
+        source_ssrc,
+        KeyframeKind::Pli,
+        start + Duration::from_millis(550),
+    );
     assert!(p6, "PLI after cooldown must be forwarded to publisher");
 }
 
@@ -128,17 +150,29 @@ fn test_sfu_bwe_congestion_control_feedback() {
     let (low_threshold, mid_threshold) = (400_000, 1_200_000);
 
     // Initial state: High layer recommended
-    assert_eq!(bwe.recommend_layer(low_threshold, mid_threshold), StreamLayer::High);
+    assert_eq!(
+        bwe.recommend_layer(low_threshold, mid_threshold),
+        StreamLayer::High
+    );
 
     // Network congestion: bitrate drops to 900 kbps, 5% loss, 120ms RTT
     bwe.update_estimate(900_000, 0.05, 120);
-    assert_eq!(bwe.recommend_layer(low_threshold, mid_threshold), StreamLayer::Medium);
+    assert_eq!(
+        bwe.recommend_layer(low_threshold, mid_threshold),
+        StreamLayer::Medium
+    );
 
     // Severe congestion: bitrate drops to 250 kbps, 18% loss, 350ms RTT
     bwe.update_estimate(250_000, 0.18, 350);
-    assert_eq!(bwe.recommend_layer(low_threshold, mid_threshold), StreamLayer::Low);
+    assert_eq!(
+        bwe.recommend_layer(low_threshold, mid_threshold),
+        StreamLayer::Low
+    );
 
     // Network recovery: bitrate back to 3 Mbps
     bwe.update_estimate(3_000_000, 0.0, 30);
-    assert_eq!(bwe.recommend_layer(low_threshold, mid_threshold), StreamLayer::High);
+    assert_eq!(
+        bwe.recommend_layer(low_threshold, mid_threshold),
+        StreamLayer::High
+    );
 }

@@ -40,20 +40,19 @@ fn test_sfu_multi_track_routing() {
 
     // Packet arrives on Audio (1111) -> Bob shouldn't receive it because he only subscribed to video
     let audio_raw = vec![
-        0x80, 0x6F, 0x00, 0x01,
-        0x00, 0x00, 0x03, 0xE8,
-        0x00, 0x00, 0x04, 0x57, // SSRC 1111
+        0x80, 0x6F, 0x00, 0x01, 0x00, 0x00, 0x03, 0xE8, 0x00, 0x00, 0x04, 0x57, // SSRC 1111
         0x12, 0x34,
     ];
     let audio_packet = AlvioRtpPacket::parse(Bytes::from(audio_raw)).unwrap();
     let routed_audio = router.route_packet(&audio_packet);
-    assert!(routed_audio.is_empty(), "Audio packet with no subscribers should not be routed");
+    assert!(
+        routed_audio.is_empty(),
+        "Audio packet with no subscribers should not be routed"
+    );
 
     // Packet arrives on Video (2222) -> Bob receives it
     let video_raw = vec![
-        0x80, 0x60, 0x00, 0x01,
-        0x00, 0x01, 0x5F, 0x90,
-        0x00, 0x00, 0x08, 0xAE, // SSRC 2222
+        0x80, 0x60, 0x00, 0x01, 0x00, 0x01, 0x5F, 0x90, 0x00, 0x00, 0x08, 0xAE, // SSRC 2222
         0xDE, 0xAD, 0xBE, 0xEF,
     ];
     let video_packet = AlvioRtpPacket::parse(Bytes::from(video_raw)).unwrap();

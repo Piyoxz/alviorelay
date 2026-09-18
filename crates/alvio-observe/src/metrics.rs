@@ -84,7 +84,11 @@ impl AlvioMetrics {
             ($name:literal, $help:literal, $field:ident) => {
                 out.push_str(concat!("# HELP ", $name, " ", $help, "\n"));
                 out.push_str(concat!("# TYPE ", $name, " counter\n"));
-                out.push_str(&format!("{} {}\n\n", $name, self.$field.load(Ordering::Relaxed)));
+                out.push_str(&format!(
+                    "{} {}\n\n",
+                    $name,
+                    self.$field.load(Ordering::Relaxed)
+                ));
             };
         }
 
@@ -92,32 +96,96 @@ impl AlvioMetrics {
             ($name:literal, $help:literal, $field:ident) => {
                 out.push_str(concat!("# HELP ", $name, " ", $help, "\n"));
                 out.push_str(concat!("# TYPE ", $name, " gauge\n"));
-                out.push_str(&format!("{} {}\n\n", $name, self.$field.load(Ordering::Relaxed)));
+                out.push_str(&format!(
+                    "{} {}\n\n",
+                    $name,
+                    self.$field.load(Ordering::Relaxed)
+                ));
             };
         }
 
         // Emit Hot Path Counters
-        emit_counter!("alvio_packets_in_total", "Total incoming media RTP packets received", packets_in);
-        emit_counter!("alvio_packets_out_total", "Total media RTP packets forwarded to subscribers", packets_out);
-        emit_counter!("alvio_packets_dropped_total", "Total media packets dropped due to buffer limits or congestion", packets_dropped);
-        emit_counter!("alvio_bytes_in_total", "Total incoming media bytes received", bytes_in);
-        emit_counter!("alvio_bytes_out_total", "Total outgoing media bytes forwarded", bytes_out);
+        emit_counter!(
+            "alvio_packets_in_total",
+            "Total incoming media RTP packets received",
+            packets_in
+        );
+        emit_counter!(
+            "alvio_packets_out_total",
+            "Total media RTP packets forwarded to subscribers",
+            packets_out
+        );
+        emit_counter!(
+            "alvio_packets_dropped_total",
+            "Total media packets dropped due to buffer limits or congestion",
+            packets_dropped
+        );
+        emit_counter!(
+            "alvio_bytes_in_total",
+            "Total incoming media bytes received",
+            bytes_in
+        );
+        emit_counter!(
+            "alvio_bytes_out_total",
+            "Total outgoing media bytes forwarded",
+            bytes_out
+        );
 
         // Emit Quality & Feedback Counters
-        emit_counter!("alvio_nack_requests_total", "Total NACK packet retransmission requests handled", nack_requests);
-        emit_counter!("alvio_pli_requests_total", "Total Picture Loss Indication (PLI) keyframe requests handled", pli_requests);
+        emit_counter!(
+            "alvio_nack_requests_total",
+            "Total NACK packet retransmission requests handled",
+            nack_requests
+        );
+        emit_counter!(
+            "alvio_pli_requests_total",
+            "Total Picture Loss Indication (PLI) keyframe requests handled",
+            pli_requests
+        );
 
         // Emit Non-Media & Egress Counters
-        emit_counter!("alvio_data_packets_total", "Total WebRTC DataChannel packets routed", data_packets);
-        emit_counter!("alvio_webhooks_dispatched_total", "Total outbound webhook notifications dispatched", webhooks_dispatched);
-        emit_counter!("alvio_webhooks_delivered_total", "Total outbound webhook notifications successfully delivered", webhooks_delivered);
+        emit_counter!(
+            "alvio_data_packets_total",
+            "Total WebRTC DataChannel packets routed",
+            data_packets
+        );
+        emit_counter!(
+            "alvio_webhooks_dispatched_total",
+            "Total outbound webhook notifications dispatched",
+            webhooks_dispatched
+        );
+        emit_counter!(
+            "alvio_webhooks_delivered_total",
+            "Total outbound webhook notifications successfully delivered",
+            webhooks_delivered
+        );
 
         // Emit Active Gauges
-        emit_gauge!("alvio_rooms_active", "Number of active media rooms currently in memory", rooms_active);
-        emit_gauge!("alvio_peers_active", "Number of active connected peers across all rooms", peers_active);
-        emit_gauge!("alvio_tracks_active", "Number of active media tracks currently published", tracks_active);
-        emit_gauge!("alvio_recordings_active", "Number of egress recording sessions currently active", recordings_active);
-        emit_gauge!("alvio_whip_sessions_active", "Number of WHIP broadcast sessions currently publishing", whip_sessions_active);
+        emit_gauge!(
+            "alvio_rooms_active",
+            "Number of active media rooms currently in memory",
+            rooms_active
+        );
+        emit_gauge!(
+            "alvio_peers_active",
+            "Number of active connected peers across all rooms",
+            peers_active
+        );
+        emit_gauge!(
+            "alvio_tracks_active",
+            "Number of active media tracks currently published",
+            tracks_active
+        );
+        emit_gauge!(
+            "alvio_recordings_active",
+            "Number of egress recording sessions currently active",
+            recordings_active
+        );
+        emit_gauge!(
+            "alvio_whip_sessions_active",
+            "Number of WHIP broadcast sessions currently publishing",
+            whip_sessions_active
+        );
 
         out
     }

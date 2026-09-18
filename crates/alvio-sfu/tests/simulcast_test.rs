@@ -72,8 +72,14 @@ fn test_simulcast_multi_layer_routing_and_switching() {
     assert_eq!(fwd_high[0].header.sequence_number, 100);
     assert_eq!(fwd_high[0].payload.as_ref(), b"high-frame-1");
 
-    assert!(fwd_med.is_empty(), "Medium packet must be gated out for High subscriber");
-    assert!(fwd_low.is_empty(), "Low packet must be gated out for High subscriber");
+    assert!(
+        fwd_med.is_empty(),
+        "Medium packet must be gated out for High subscriber"
+    );
+    assert!(
+        fwd_low.is_empty(),
+        "Low packet must be gated out for High subscriber"
+    );
 
     // Alice sends second High packet
     let p_high_2 = make_packet(ssrc_high, 11, b"high-frame-2");
@@ -82,7 +88,8 @@ fn test_simulcast_multi_layer_routing_and_switching() {
     assert_eq!(fwd_high_2[0].header.sequence_number, 101);
 
     // 4. Bob requests layer switch to Low (e.g. user minimized window / network bandwidth dropped)
-    let switch_ok = router.switch_consumer_layer(primary_ssrc, "bob-video-consumer", StreamLayer::Low);
+    let switch_ok =
+        router.switch_consumer_layer(primary_ssrc, "bob-video-consumer", StreamLayer::Low);
     assert!(switch_ok);
     assert_eq!(bob_sub.target_layer(), StreamLayer::Low);
     assert_eq!(bob_sub.current_layer(), StreamLayer::High); // Still High until Low keyframe!
@@ -90,7 +97,10 @@ fn test_simulcast_multi_layer_routing_and_switching() {
     // Alice sends regular (non-keyframe) Low packet
     let p_low_delta = make_packet(ssrc_low, 11, b"low-delta-p-frame");
     let fwd_low_delta = router.route_packet_with_keyframe(&p_low_delta, false);
-    assert!(fwd_low_delta.is_empty(), "Delta frame must not trigger premature layer switch");
+    assert!(
+        fwd_low_delta.is_empty(),
+        "Delta frame must not trigger premature layer switch"
+    );
 
     // Alice sends High packet in the meantime: Bob still receives it safely
     let p_high_3 = make_packet(ssrc_high, 12, b"high-frame-3");
@@ -101,7 +111,11 @@ fn test_simulcast_multi_layer_routing_and_switching() {
     // Now Alice sends a Low Keyframe (I-frame / IDR)!
     let p_low_keyframe = make_packet(ssrc_low, 12, b"low-keyframe-i-frame");
     let fwd_low_key = router.route_packet_with_keyframe(&p_low_keyframe, true);
-    assert_eq!(fwd_low_key.len(), 1, "Keyframe must activate the pending layer switch");
+    assert_eq!(
+        fwd_low_key.len(),
+        1,
+        "Keyframe must activate the pending layer switch"
+    );
     assert_eq!(fwd_low_key[0].header.sequence_number, 103);
     assert_eq!(fwd_low_key[0].payload.as_ref(), b"low-keyframe-i-frame");
 

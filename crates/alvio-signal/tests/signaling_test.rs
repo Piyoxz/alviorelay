@@ -20,7 +20,9 @@ async fn test_full_signaling_lifecycle() {
     let ws_url = format!("ws://{addr}/ws");
 
     // Connect Client 1 (Alice)
-    let (ws_stream1, _) = connect_async(&ws_url).await.expect("Client 1 should connect");
+    let (ws_stream1, _) = connect_async(&ws_url)
+        .await
+        .expect("Client 1 should connect");
     let (mut write1, mut read1) = ws_stream1.split();
 
     // Client 1 should receive ACK
@@ -64,7 +66,9 @@ async fn test_full_signaling_lifecycle() {
     }
 
     // Connect Client 2 (Bob)
-    let (ws_stream2, _) = connect_async(&ws_url).await.expect("Client 2 should connect");
+    let (ws_stream2, _) = connect_async(&ws_url)
+        .await
+        .expect("Client 2 should connect");
     let (mut write2, mut read2) = ws_stream2.split();
 
     // Client 2 receives ACK

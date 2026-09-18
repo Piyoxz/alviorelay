@@ -109,7 +109,8 @@ impl DataRouter {
 
     /// Declares a global data channel topic/label with its reliability profile.
     pub fn declare_channel(&self, metadata: DataChannelMetadata) {
-        self.declared_channels.insert(metadata.label.clone(), metadata);
+        self.declared_channels
+            .insert(metadata.label.clone(), metadata);
     }
 
     /// Subscribes a peer to a specific data channel label (e.g. "chat", "cursor").
@@ -185,7 +186,10 @@ mod tests {
         assert!(chat.ordered);
 
         let cursor = DataChannelMetadata::lossy("cursor", 0);
-        assert_eq!(cursor.reliability, DataChannelReliability::UnreliableLossy { max_retransmits: 0 });
+        assert_eq!(
+            cursor.reliability,
+            DataChannelReliability::UnreliableLossy { max_retransmits: 0 }
+        );
         assert!(!cursor.ordered);
     }
 

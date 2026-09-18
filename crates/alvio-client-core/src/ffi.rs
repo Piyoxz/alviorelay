@@ -1,12 +1,15 @@
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+
+use crate::event::ClientEvent;
+use crate::room::ClientRoom;
+
+use crate::state::ConnectionState;
+use alvio_core::{RoomId, StreamKind, StreamLayer};
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::sync::Arc;
-use alvio_core::{RoomId, StreamKind, StreamLayer};
 use tokio::runtime::Runtime;
 use tokio::sync::mpsc;
-use crate::event::ClientEvent;
-use crate::room::ClientRoom;
-use crate::state::ConnectionState;
 
 /// Opaque client handle exposed across C FFI boundaries.
 pub struct AlvioClientHandle {
@@ -105,11 +108,15 @@ pub extern "C" fn alvio_client_join(
     let r_id = RoomId::new(room_id_str);
     let p_name = peer_name_str.to_string();
 
-    let res = client.runtime.block_on(async move {
-        room.join(r_id, p_name, None).await
-    });
+    let res = client
+        .runtime
+        .block_on(async move { room.join(r_id, p_name, None).await });
 
-    if res.is_ok() { 0 } else { -1 }
+    if res.is_ok() {
+        0
+    } else {
+        -1
+    }
 }
 
 /// Publish a track. Kind: 0 = Audio, 1 = Video.
@@ -143,11 +150,15 @@ pub extern "C" fn alvio_client_publish_track(
         vec![StreamLayer::High]
     };
 
-    let res = client.runtime.block_on(async move {
-        room.publish_track(stream_kind, source_str, layers).await
-    });
+    let res = client
+        .runtime
+        .block_on(async move { room.publish_track(stream_kind, source_str, layers).await });
 
-    if res.is_ok() { 0 } else { -1 }
+    if res.is_ok() {
+        0
+    } else {
+        -1
+    }
 }
 
 /// Send application data message to room. Returns 0 on success, -1 on failure.
@@ -169,11 +180,15 @@ pub extern "C" fn alvio_client_send_data(
     let client = unsafe { &mut *handle };
     let room = client.room.clone();
 
-    let res = client.runtime.block_on(async move {
-        room.send_data_message(vec![], payload_str, reliable).await
-    });
+    let res = client
+        .runtime
+        .block_on(async move { room.send_data_message(vec![], payload_str, reliable).await });
 
-    if res.is_ok() { 0 } else { -1 }
+    if res.is_ok() {
+        0
+    } else {
+        -1
+    }
 }
 
 /// Voluntarily leave the active room. Returns 0 on success, -1 on failure.
@@ -186,11 +201,13 @@ pub extern "C" fn alvio_client_leave(handle: *mut AlvioClientHandle) -> i32 {
     let client = unsafe { &mut *handle };
     let room = client.room.clone();
 
-    let res = client.runtime.block_on(async move {
-        room.leave().await
-    });
+    let res = client.runtime.block_on(async move { room.leave().await });
 
-    if res.is_ok() { 0 } else { -1 }
+    if res.is_ok() {
+        0
+    } else {
+        -1
+    }
 }
 
 /// Poll the next queued event as a JSON C-string. Returns NULL if queue is empty.

@@ -37,11 +37,17 @@ impl IntoResponse for IngressError {
         let (status, message) = match &self {
             Self::InvalidSdp(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
             Self::UnsupportedContentType(msg) => (StatusCode::UNSUPPORTED_MEDIA_TYPE, msg.clone()),
-            Self::SessionNotFound(id) => (StatusCode::NOT_FOUND, format!("Resource '{id}' not found")),
-            Self::Unauthorized => (StatusCode::UNAUTHORIZED, "Authentication required".to_string()),
-            Self::RoomCapacityExceeded(room) => {
-                (StatusCode::CONFLICT, format!("Room '{room}' capacity exceeded"))
+            Self::SessionNotFound(id) => {
+                (StatusCode::NOT_FOUND, format!("Resource '{id}' not found"))
             }
+            Self::Unauthorized => (
+                StatusCode::UNAUTHORIZED,
+                "Authentication required".to_string(),
+            ),
+            Self::RoomCapacityExceeded(room) => (
+                StatusCode::CONFLICT,
+                format!("Room '{room}' capacity exceeded"),
+            ),
             Self::Transport(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
             Self::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
         };

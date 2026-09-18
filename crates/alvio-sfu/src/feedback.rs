@@ -37,7 +37,11 @@ impl KeyframeController {
         let mut last_requests = self.last_requests.write();
         if let Some(&last_time) = last_requests.get(&ssrc) {
             if now.saturating_duration_since(last_time) < self.cooldown {
-                debug!(ssrc, ?kind, "Suppressed keyframe request within cooldown window");
+                debug!(
+                    ssrc,
+                    ?kind,
+                    "Suppressed keyframe request within cooldown window"
+                );
                 return false;
             }
         }
@@ -76,13 +80,25 @@ mod tests {
         assert!(controller.request_keyframe(ssrc, KeyframeKind::Pli, now));
 
         // Rapid second request (at +50ms) is throttled
-        assert!(!controller.request_keyframe(ssrc, KeyframeKind::Pli, now + Duration::from_millis(50)));
+        assert!(!controller.request_keyframe(
+            ssrc,
+            KeyframeKind::Pli,
+            now + Duration::from_millis(50)
+        ));
 
         // Rapid FIR request is also throttled
-        assert!(!controller.request_keyframe(ssrc, KeyframeKind::Fir, now + Duration::from_millis(150)));
+        assert!(!controller.request_keyframe(
+            ssrc,
+            KeyframeKind::Fir,
+            now + Duration::from_millis(150)
+        ));
 
         // After cooldown (+250ms), request is allowed again
-        assert!(controller.request_keyframe(ssrc, KeyframeKind::Pli, now + Duration::from_millis(250)));
+        assert!(controller.request_keyframe(
+            ssrc,
+            KeyframeKind::Pli,
+            now + Duration::from_millis(250)
+        ));
     }
 
     #[test]
@@ -95,7 +111,15 @@ mod tests {
         assert!(controller.request_keyframe(1002, KeyframeKind::Pli, now));
 
         // Both are in cooldown
-        assert!(!controller.request_keyframe(1001, KeyframeKind::Pli, now + Duration::from_millis(50)));
-        assert!(!controller.request_keyframe(1002, KeyframeKind::Pli, now + Duration::from_millis(50)));
+        assert!(!controller.request_keyframe(
+            1001,
+            KeyframeKind::Pli,
+            now + Duration::from_millis(50)
+        ));
+        assert!(!controller.request_keyframe(
+            1002,
+            KeyframeKind::Pli,
+            now + Duration::from_millis(50)
+        ));
     }
 }

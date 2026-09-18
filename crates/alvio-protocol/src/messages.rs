@@ -71,13 +71,9 @@ pub enum SignalMessage {
         metadata: Option<String>,
     },
     /// WebRTC SDP Offer from client.
-    Offer {
-        sdp: String,
-    },
+    Offer { sdp: String },
     /// WebRTC SDP Answer from client.
-    Answer {
-        sdp: String,
-    },
+    Answer { sdp: String },
     /// Trickle ICE candidate from client.
     Candidate {
         candidate: String,
@@ -93,9 +89,7 @@ pub enum SignalMessage {
         layers: Vec<StreamLayer>,
     },
     /// Unpublish a previously published media track.
-    UnpublishTrack {
-        track_id: TrackId,
-    },
+    UnpublishTrack { track_id: TrackId },
     /// Subscribe to a remote peer's media track.
     Subscribe {
         track_id: TrackId,
@@ -122,10 +116,7 @@ pub enum SignalMessage {
     // Server -> Client
     // -------------------------------------------------------------
     /// Handshake acknowledgment with assigned PeerId.
-    Ack {
-        peer_id: PeerId,
-        node_id: String,
-    },
+    Ack { peer_id: PeerId, node_id: String },
     /// Notification of successful room join with snapshot of existing state.
     RoomJoined {
         room_id: RoomId,
@@ -134,22 +125,13 @@ pub enum SignalMessage {
         active_tracks: Vec<TrackInfo>,
     },
     /// Broadcast that a new peer has joined the room.
-    PeerJoined {
-        peer: PeerInfo,
-    },
+    PeerJoined { peer: PeerInfo },
     /// Broadcast that a peer has left the room.
-    PeerLeft {
-        peer_id: PeerId,
-        reason: String,
-    },
+    PeerLeft { peer_id: PeerId, reason: String },
     /// Server-generated SDP Offer (for subscriptions / renegotiation).
-    RemoteOffer {
-        sdp: String,
-    },
+    RemoteOffer { sdp: String },
     /// Server response SDP Answer to a client offer.
-    RemoteAnswer {
-        sdp: String,
-    },
+    RemoteAnswer { sdp: String },
     /// Server-generated ICE Candidate.
     RemoteCandidate {
         candidate: String,
@@ -159,23 +141,16 @@ pub enum SignalMessage {
         sdp_mline_index: Option<u32>,
     },
     /// Broadcast that a peer published a new track.
-    TrackPublished {
-        track: TrackInfo,
-    },
+    TrackPublished { track: TrackInfo },
     /// Broadcast that a track was removed.
-    TrackUnpublished {
-        track_id: TrackId,
-    },
+    TrackUnpublished { track_id: TrackId },
     /// Incoming data message routed from another peer.
     DataReceived {
         source_peer_id: PeerId,
         payload: String,
     },
     /// Error notification sent to the client.
-    Error {
-        code: String,
-        message: String,
-    },
+    Error { code: String, message: String },
     /// Heartbeat keepalive pong.
     Pong,
 }
@@ -201,7 +176,8 @@ mod tests {
         assert!(json.contains("\"room_id\":\"conf-room-1\""));
         assert!(json.contains("\"peer_name\":\"Alice\""));
 
-        let deserialized: SignalEnvelope = SignalEnvelope::from_json(&json).expect("Deserialization should succeed");
+        let deserialized: SignalEnvelope =
+            SignalEnvelope::from_json(&json).expect("Deserialization should succeed");
         assert_eq!(deserialized.version, env.version);
         assert_eq!(deserialized.body, msg);
     }
@@ -216,13 +192,18 @@ mod tests {
             layers: vec![StreamLayer::Low, StreamLayer::High],
         };
 
-        let env = SignalEnvelope::new(SignalMessage::TrackPublished { track: track.clone() });
+        let env = SignalEnvelope::new(SignalMessage::TrackPublished {
+            track: track.clone(),
+        });
         let json = env.to_json().unwrap();
         assert!(json.contains("\"type\":\"track_published\""));
         assert!(json.contains("\"track-video-01\""));
 
         let parsed = SignalEnvelope::from_json(&json).unwrap();
-        if let SignalMessage::TrackPublished { track: parsed_track } = parsed.body {
+        if let SignalMessage::TrackPublished {
+            track: parsed_track,
+        } = parsed.body
+        {
             assert_eq!(parsed_track, track);
         } else {
             panic!("Expected TrackPublished variant");

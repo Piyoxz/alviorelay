@@ -99,7 +99,10 @@ async fn test_full_egress_recording_pipeline_with_storage() {
 
     // 5. Store the recorded asset into StorageBackend
     let dummy_video_file = Bytes::from_static(b"RIFF-simulated-encoded-mp4-video-container");
-    let stored_meta = storage.put(&output.destination_path, dummy_video_file.clone()).await.unwrap();
+    let stored_meta = storage
+        .put(&output.destination_path, dummy_video_file.clone())
+        .await
+        .unwrap();
     assert_eq!(stored_meta.path, dest_filename);
     assert_eq!(stored_meta.content_type, "video/mp4");
     assert!(storage.exists(dest_filename).await.unwrap());
