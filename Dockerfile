@@ -2,17 +2,19 @@
 # AlvioRelay Production Multi-Stage Dockerfile
 # Stage 1: Builder
 # ==============================================================================
-FROM rust:1.82-bookworm AS builder
+FROM rust:bookworm AS builder
 
 WORKDIR /usr/src/alvio
 
-# Install build dependencies for cryptographic and WebRTC compilation (aws-lc-sys requires cmake and clang)
+# Install build dependencies for cryptographic and WebRTC compilation
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     cmake \
     clang \
     pkg-config \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy workspace dependencies and source trees
 COPY Cargo.toml Cargo.lock ./
