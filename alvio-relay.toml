@@ -1,0 +1,41 @@
+# AlvioRelay Configuration File
+# Documentation: https://github.com/Piyoxz/alviorelay
+
+[server]
+node_id = "alvio-node-01"
+bind_address = "0.0.0.0"
+http_port = 7880
+ws_port = 7880
+log_level = "info"
+
+[rtc]
+udp_port = 7882
+tcp_port = 7881
+use_external_ip = false
+# external_ip = "203.0.113.1"
+ice_servers = [
+    { urls = ["stun:stun.l.google.com:19302"] }
+]
+
+[room]
+empty_timeout_secs = 300
+max_peers_per_room = 100
+enable_data_channels = true
+
+[auth]
+provider = "no_auth" # options: "no_auth", "jwt", "api_key"
+# secret_key = "change_this_in_production"
+
+[egress]
+enabled = false
+storage_backend = "local" # options: "local", "s3"
+local_storage_dir = "./recordings"
+
+[ingress]
+enabled = false
+whip_port = 7885
+
+[webhooks]
+enabled = false
+# endpoint_url = "https://your-api.com/webhooks/alvio"
+# secret = "webhook_secret_key"

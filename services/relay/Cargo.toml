@@ -1,0 +1,18 @@
+[package]
+name = "alvio-relay"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "alvio-relay"
+path = "src/main.rs"
+
+[dependencies]
+alvio-core = { path = "../../crates/alvio-core" }
+alvio-observe = { path = "../../crates/alvio-observe" }
+tokio = { workspace = true }
+clap = { workspace = true }
+tracing = { workspace = true }
+serde_json = { workspace = true }
