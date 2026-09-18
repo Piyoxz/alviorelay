@@ -28,7 +28,7 @@ Classification:
 | **Egress** | Virtual Recording Peer | `IMPLEMENTED` | Phase 8 | Non-blocking tap |
 | **Egress** | FFmpeg Process Supervisor | `IMPLEMENTED` | Phase 8 | Isolated worker process |
 | **Storage** | StorageBackend (Local & S3) | `IMPLEMENTED` | Phase 8 | Pluggable trait |
-| **Ingress** | WHIP Endpoint | `PLANNED` | Phase 9 | OBS / WebRTC ingest |
+| **Ingress** | WHIP Endpoint | `IMPLEMENTED` | Phase 9 | OBS / WebRTC ingest |
 | **Hooks** | Webhook Dispatcher & HMAC | `PLANNED` | Phase 10 | Retry & backoff |
 | **Observability**| Prometheus `/metrics` & Health | `PLANNED` | Phase 11 | `/health` and `/ready` |
 | **Scaling** | Node Placement & Drain Mode | `PLANNED` | Phase 12 | Authoritative room node |

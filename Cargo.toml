@@ -8,6 +8,7 @@ members = [
     "crates/alvio-sfu",
     "crates/alvio-storage",
     "crates/alvio-egress",
+    "crates/alvio-ingress",
     "services/relay",
 ]
 resolver = "2"

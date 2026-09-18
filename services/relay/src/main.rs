@@ -110,7 +110,20 @@ fn print_banner(config: &AlvioConfig) {
 
 async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
     let registry = RoomRegistry::new(config.room.max_peers_per_room);
-    let app = create_signaling_router(registry, config.server.node_id.clone());
+    let signaling_app = create_signaling_router(registry.clone(), config.server.node_id.clone());
+
+    let rtc_addr = format!("{}:{}", config.server.bind_address, config.rtc.udp_port)
+        .parse()
+        .map_err(|e| alvio_core::AlvioError::Config(format!("Invalid RTC bind address: {e}")))?;
+
+    let whip_state = alvio_ingress::WhipState::new(
+        alvio_ingress::WhipRegistry::new(),
+        registry,
+        rtc_addr,
+        None,
+    );
+    let whip_router = alvio_ingress::create_whip_router(whip_state);
+    let app = signaling_app.nest("/whip", whip_router);
 
     let addr = format!("{}:{}", config.server.bind_address, config.server.http_port);
     let listener = tokio::net::TcpListener::bind(&addr)
@@ -119,7 +132,7 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
 
     info!(
         bind = %addr,
-        "Signaling and HTTP gateway ready at http://{addr}/ and ws://{addr}/ws"
+        "Signaling, WHIP Ingress, and HTTP gateway ready at http://{addr}/, ws://{addr}/ws, and http://{addr}/whip/{{room_id}}"
     );
 
     // Run Axum server with graceful drain mode on shutdown

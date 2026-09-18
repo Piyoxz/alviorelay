@@ -30,7 +30,7 @@ async fn root_handler() -> Html<&'static str> {
     <h1 style="margin: 0; color: #38bdf8;">AlvioRelay</h1>
     <p style="color: #94a3b8; margin: 0.5rem 0 1.5rem 0;">Rust-Native Self-Hosted Real-Time Media Infrastructure</p>
     <div style="display: inline-block; padding: 0.25rem 0.75rem; background: #065f46; color: #34d399; border-radius: 999px; font-size: 0.875rem; font-weight: 600;">Status: Online & Ready</div>
-    <p style="font-size: 0.85rem; color: #64748b; margin-top: 1.5rem;">Connect via WebSocket endpoint at <code>/ws</code></p>
+    <p style="font-size: 0.85rem; color: #64748b; margin-top: 1.5rem;">Connect via WebSocket at <code>/ws</code> or broadcast via WHIP at <code>/whip/{room_id}</code></p>
   </div>
 </body>
 </html>"#)

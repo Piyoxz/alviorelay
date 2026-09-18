@@ -63,6 +63,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "alvio-ingress"
+version = "0.1.0"
+dependencies = [
+ "alvio-core",
+ "alvio-signal",
+ "alvio-webrtc",
+ "axum",
+ "bytes",
+ "dashmap",
+ "http-body-util",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "str0m",
+ "thiserror",
+ "tokio",
+ "tower",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "alvio-observe"
 version = "0.1.0"
 dependencies = [
@@ -87,6 +109,7 @@ name = "alvio-relay"
 version = "0.1.0"
 dependencies = [
  "alvio-core",
+ "alvio-ingress",
  "alvio-observe",
  "alvio-protocol",
  "alvio-signal",
