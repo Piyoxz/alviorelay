@@ -1,0 +1,18 @@
+name: alvio_flutter
+description: Official Flutter plugin for AlvioRelay WebRTC SFU (iOS, Android, Windows, macOS, Linux, Web)
+version: 0.1.0
+homepage: https://github.com/Piyoxz/alviorelay
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_webrtc: ^0.11.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0

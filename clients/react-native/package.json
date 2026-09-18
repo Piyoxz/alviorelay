@@ -1,0 +1,15 @@
+{
+  "name": "@alviorelay/react-native",
+  "version": "0.1.0",
+  "description": "Official React Native TurboModule SDK for AlvioRelay WebRTC SFU (iOS & Android)",
+  "main": "src/index.tsx",
+  "scripts": {
+    "test": "echo \"React Native test suite\""
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-webrtc": "^118.0.0"
+  },
+  "license": "MIT OR Apache-2.0"
+}

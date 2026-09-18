@@ -13,3 +13,11 @@ dashmap = { workspace = true }
 parking_lot = { workspace = true }
 tracing = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = "0.5"
+tokio = { workspace = true, features = ["full"] }
+
+[[bench]]
+name = "sfu_routing_bench"
+harness = false
