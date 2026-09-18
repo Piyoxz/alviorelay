@@ -31,7 +31,7 @@ Classification:
 | **Ingress** | WHIP Endpoint | `IMPLEMENTED` | Phase 9 | OBS / WebRTC ingest |
 | **Hooks** | Webhook Dispatcher & HMAC | `IMPLEMENTED` | Phase 10 | Retry & backoff |
 | **Observability**| Prometheus `/metrics` & Health | `IMPLEMENTED` | Phase 11 | `/health` and `/ready` |
-| **Scaling** | Node Placement & Drain Mode | `PLANNED` | Phase 12 | Authoritative room node |
+| **Scaling** | Node Placement & Drain Mode | `IMPLEMENTED` | Phase 12 | Authoritative room node |
 | **Packaging** | Dockerfile & Docker Compose | `PLANNED` | Phase 13 | Self-hosted 1-command up |
 | **Client SDK (Web)** | `@alviorelay/client` (TypeScript) | `PLANNED` | Phase 14 | Modern browsers (Chrome, Firefox, Safari, Edge) |
 | **Client SDK (Desktop Windows)** | `alvio-desktop-windows` (C++ / Rust / WinUI) | `PLANNED` | Phase 14 | Native Windows `.exe`, low-latency audio/video capture |

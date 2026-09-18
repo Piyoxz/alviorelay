@@ -4,7 +4,10 @@ pub mod metrics;
 use alvio_core::AlvioResult;
 use tracing_subscriber::{fmt, EnvFilter};
 
-pub use health::{get_uptime_secs, health_handler, init_server_start_time, metrics_handler, ready_handler};
+pub use health::{
+    get_uptime_secs, health_handler, init_server_start_time, is_draining, metrics_handler,
+    ready_handler, set_draining,
+};
 pub use metrics::{get_metrics, AlvioMetrics};
 
 /// Initializes structured logging for AlvioRelay using `tracing` and `tracing-subscriber`.

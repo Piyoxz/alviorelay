@@ -1,0 +1,16 @@
+[package]
+name = "alvio-cluster"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+alvio-core = { path = "../alvio-core" }
+tokio = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }

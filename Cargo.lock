@@ -33,6 +33,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "alvio-cluster"
+version = "0.1.0"
+dependencies = [
+ "alvio-core",
+ "dashmap",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "alvio-core"
 version = "0.1.0"
 dependencies = [

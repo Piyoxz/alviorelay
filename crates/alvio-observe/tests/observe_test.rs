@@ -70,10 +70,21 @@ async fn test_health_and_ready_endpoints() {
         .body(Body::empty())
         .unwrap();
 
-    let ready_resp = app.oneshot(ready_req).await.unwrap();
+    let ready_resp = app.clone().oneshot(ready_req).await.unwrap();
     assert_eq!(ready_resp.status(), StatusCode::OK);
 
     let ready_body = ready_resp.into_body().collect().await.unwrap().to_bytes();
     let ready_json: serde_json::Value = serde_json::from_slice(&ready_body).unwrap();
     assert_eq!(ready_json["status"], "ready");
+
+    // 3. Drain Mode returns 503 Service Unavailable
+    alvio_observe::set_draining(true);
+    let draining_req = Request::builder()
+        .uri("/ready")
+        .body(Body::empty())
+        .unwrap();
+
+    let draining_resp = app.oneshot(draining_req).await.unwrap();
+    assert_eq!(draining_resp.status(), StatusCode::SERVICE_UNAVAILABLE);
+    alvio_observe::set_draining(false);
 }

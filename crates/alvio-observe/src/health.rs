@@ -4,13 +4,23 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use serde::{Deserialize, Serialize};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::OnceLock;
 use std::time::Instant;
 
 static SERVER_START_TIME: OnceLock<Instant> = OnceLock::new();
+static IS_DRAINING: AtomicBool = AtomicBool::new(false);
 
 pub fn init_server_start_time() {
     SERVER_START_TIME.get_or_init(Instant::now);
+}
+
+pub fn set_draining(draining: bool) {
+    IS_DRAINING.store(draining, Ordering::SeqCst);
+}
+
+pub fn is_draining() -> bool {
+    IS_DRAINING.load(Ordering::Relaxed)
 }
 
 pub fn get_uptime_secs() -> u64 {
@@ -52,9 +62,27 @@ pub async fn health_handler() -> impl IntoResponse {
 }
 
 /// Endpoint handler for Kubernetes readiness probe `/ready`.
-pub async fn ready_handler() -> impl IntoResponse {
-    Json(ReadyResponse {
-        status: "ready",
-        uptime_secs: get_uptime_secs(),
-    })
+///
+/// Returns HTTP 200 OK when active and healthy.
+/// Returns HTTP 503 Service Unavailable when in Graceful Drain Mode.
+pub async fn ready_handler() -> Response {
+    if is_draining() {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "status": "draining",
+                "message": "Node is in graceful drain mode, not accepting new connections"
+            })),
+        )
+            .into_response();
+    }
+
+    (
+        StatusCode::OK,
+        Json(ReadyResponse {
+            status: "ready",
+            uptime_secs: get_uptime_secs(),
+        }),
+    )
+        .into_response()
 }
