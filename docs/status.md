@@ -24,7 +24,7 @@ Classification:
 | **SFU** | NACK Ring Buffer & PLI / FIR | `IMPLEMENTED` | Phase 5 | Packet loss recovery |
 | **SFU** | TWCC & Bandwidth Estimation | `IMPLEMENTED` | Phase 5 | Congestion control |
 | **SFU** | Simulcast Layer Selection | `IMPLEMENTED` | Phase 6 | Low/Med/High switching |
-| **Data** | WebRTC Data Channels | `PLANNED` | Phase 7 | Reliable & Unreliable |
+| **Data** | WebRTC Data Channels | `IMPLEMENTED` | Phase 7 | Reliable & Unreliable |
 | **Egress** | Virtual Recording Peer | `PLANNED` | Phase 8 | Non-blocking tap |
 | **Egress** | FFmpeg Process Supervisor | `PLANNED` | Phase 8 | Isolated worker process |
 | **Storage** | StorageBackend (Local & S3) | `PLANNED` | Phase 8 | Pluggable trait |

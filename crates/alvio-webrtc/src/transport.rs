@@ -8,6 +8,17 @@ use str0m::net::{Protocol, Receive};
 use str0m::{Candidate, Event, Input, Output, Rtc};
 use tracing::{debug, info, warn};
 
+pub use str0m::channel::{ChannelId, Reliability};
+
+/// Data packet carried across a WebRTC SCTP DataChannel.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlvioDataPacket {
+    pub channel_id: ChannelId,
+    pub label: String,
+    pub binary: bool,
+    pub data: Bytes,
+}
+
 #[derive(Debug)]
 pub enum AlvioTransportOutput {
     /// UDP packet that must be transmitted over the socket to a destination address.
@@ -28,6 +39,17 @@ pub enum AlvioTransportOutput {
     },
     /// Egress Bandwidth estimate update (from TWCC / GCC) in bps.
     EgressBitrateEstimate(u64),
+    /// WebRTC DataChannel opened.
+    DataChannelOpen {
+        channel_id: ChannelId,
+        label: String,
+    },
+    /// Incoming data packet from remote peer on a DataChannel.
+    DataChannelData(AlvioDataPacket),
+    /// DataChannel closed.
+    DataChannelClose {
+        channel_id: ChannelId,
+    },
     /// Next deadline when `handle_timeout` should be invoked.
     Timeout(Instant),
 }
@@ -37,6 +59,7 @@ pub struct AlvioTransport {
     rtc: Rtc,
     local_addr: SocketAddr,
     connected: bool,
+    channel_labels: std::collections::HashMap<ChannelId, String>,
 }
 
 impl AlvioTransport {
@@ -53,6 +76,7 @@ impl AlvioTransport {
             rtc,
             local_addr,
             connected: false,
+            channel_labels: std::collections::HashMap::new(),
         })
     }
 
@@ -70,6 +94,46 @@ impl AlvioTransport {
         let answer_sdp = answer.to_sdp_string();
         info!("Accepted remote SDP offer, generated SDP answer (len={})", answer_sdp.len());
         Ok(answer_sdp)
+    }
+
+    /// Creates an outgoing DataChannel with the given label and reliability configuration.
+    pub fn create_data_channel(
+        &mut self,
+        label: &str,
+        ordered: bool,
+        max_retransmits: Option<u16>,
+    ) -> ChannelId {
+        let reliability = if let Some(n) = max_retransmits {
+            Reliability::MaxRetransmits { retransmits: n }
+        } else {
+            Reliability::Reliable
+        };
+
+        let config = str0m::channel::ChannelConfig {
+            label: label.to_string(),
+            ordered,
+            reliability,
+            ..Default::default()
+        };
+
+        let id = self.rtc.direct_api().create_data_channel(config);
+        self.channel_labels.insert(id, label.to_string());
+        id
+    }
+
+    /// Transmits data on an active DataChannel.
+    pub fn send_data_channel(
+        &mut self,
+        channel_id: ChannelId,
+        binary: bool,
+        data: &[u8],
+    ) -> AlvioResult<bool> {
+        if let Some(mut chan) = self.rtc.channel(channel_id) {
+            chan.write(binary, data)
+                .map_err(|e| AlvioError::Transport(format!("Failed to write to DataChannel: {e}")))
+        } else {
+            Ok(false)
+        }
     }
 
     /// Feed an incoming UDP packet into the Sans-I/O WebRTC state machine.
@@ -141,6 +205,33 @@ impl AlvioTransport {
                     };
                     debug!(bitrate_bps = bps, "Received EgressBitrateEstimate");
                     Ok(Some(AlvioTransportOutput::EgressBitrateEstimate(bps)))
+                }
+                Event::ChannelOpen(id, label) => {
+                    debug!(?id, %label, "WebRTC DataChannel opened");
+                    self.channel_labels.insert(id, label.clone());
+                    Ok(Some(AlvioTransportOutput::DataChannelOpen {
+                        channel_id: id,
+                        label,
+                    }))
+                }
+                Event::ChannelData(data) => {
+                    let label = self
+                        .channel_labels
+                        .get(&data.id)
+                        .cloned()
+                        .unwrap_or_default();
+                    let packet = AlvioDataPacket {
+                        channel_id: data.id,
+                        label,
+                        binary: data.binary,
+                        data: Bytes::from(data.data),
+                    };
+                    Ok(Some(AlvioTransportOutput::DataChannelData(packet)))
+                }
+                Event::ChannelClose(id) => {
+                    debug!(?id, "WebRTC DataChannel closed");
+                    self.channel_labels.remove(&id);
+                    Ok(Some(AlvioTransportOutput::DataChannelClose { channel_id: id }))
                 }
                 Event::RtpPacket(rtp) => {
                     let packet = AlvioRtpPacket {
