@@ -21,6 +21,13 @@ pub enum AlvioTransportOutput {
     Connected,
     /// Connection state changed to disconnected.
     Disconnected,
+    /// Downstream peer requested an intra keyframe (PLI/FIR).
+    KeyframeRequest {
+        mid: String,
+        kind: str0m::media::KeyframeRequestKind,
+    },
+    /// Egress Bandwidth estimate update (from TWCC / GCC) in bps.
+    EgressBitrateEstimate(u64),
     /// Next deadline when `handle_timeout` should be invoked.
     Timeout(Instant),
 }
@@ -119,6 +126,22 @@ impl AlvioTransport {
                         Ok(None)
                     }
                 }
+                Event::KeyframeRequest(req) => {
+                    debug!(mid = %req.mid, kind = ?req.kind, "Received downstream KeyframeRequest");
+                    Ok(Some(AlvioTransportOutput::KeyframeRequest {
+                        mid: req.mid.to_string(),
+                        kind: req.kind,
+                    }))
+                }
+                Event::EgressBitrateEstimate(bwe) => {
+                    let bps = match bwe {
+                        str0m::bwe::BweKind::Twcc(rate) => rate.as_u64(),
+                        str0m::bwe::BweKind::Remb(_, rate) => rate.as_u64(),
+                        _ => 0,
+                    };
+                    debug!(bitrate_bps = bps, "Received EgressBitrateEstimate");
+                    Ok(Some(AlvioTransportOutput::EgressBitrateEstimate(bps)))
+                }
                 Event::RtpPacket(rtp) => {
                     let packet = AlvioRtpPacket {
                         header: crate::packet::RtpHeader {
@@ -142,6 +165,17 @@ impl AlvioTransport {
                 warn!("WebRTC poll_output error: {:?}", e);
                 Err(AlvioError::Transport(format!("WebRTC poll_output error: {e}")))
             }
+        }
+    }
+
+    /// Dispatches a keyframe request (PLI or FIR) upstream to the publisher of the given SSRC.
+    pub fn request_keyframe(&mut self, ssrc: u32, kind: str0m::media::KeyframeRequestKind) -> bool {
+        let ssrc_val = str0m::rtp::Ssrc::from(ssrc);
+        if let Some(stream) = self.rtc.direct_api().stream_rx(&ssrc_val) {
+            stream.request_keyframe(kind);
+            true
+        } else {
+            false
         }
     }
 

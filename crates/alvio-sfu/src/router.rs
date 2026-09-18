@@ -1,16 +1,21 @@
+use crate::feedback::{KeyframeController, KeyframeKind};
+use crate::nack::NackBuffer;
 use crate::track::{StreamConsumer, StreamSource};
 use alvio_webrtc::AlvioRtpPacket;
 use dashmap::DashMap;
 use std::sync::Arc;
+use std::time::Instant;
 use tracing::debug;
 
 /// Media Hot-Path RTP Forwarding Router.
 ///
 /// Implements lock-free / low-contention lookups mapping publisher SSRC to active consumers,
-/// rewriting SSRC and sequence numbers on the fly with zero blocking allocations.
+/// caching packets in NackBuffer for packet-loss recovery, and rate-limiting keyframe requests.
 pub struct RtpRouter {
     sources: DashMap<u32, Arc<StreamSource>>,
     consumers: DashMap<u32, Vec<Arc<StreamConsumer>>>,
+    nack_buffers: DashMap<u32, Arc<NackBuffer>>,
+    keyframe_controller: KeyframeController,
 }
 
 impl RtpRouter {
@@ -18,19 +23,25 @@ impl RtpRouter {
         Self {
             sources: DashMap::new(),
             consumers: DashMap::new(),
+            nack_buffers: DashMap::new(),
+            keyframe_controller: KeyframeController::default(),
         }
     }
 
-    /// Registers a new published source.
+    /// Registers a new published source and initializes its packet cache ring buffer.
     pub fn register_source(&self, source: Arc<StreamSource>) {
         debug!(ssrc = source.ssrc, track = %source.track_id, "Registered RTP stream source");
+        self.nack_buffers
+            .insert(source.ssrc, Arc::new(NackBuffer::default()));
         self.sources.insert(source.ssrc, source);
     }
 
-    /// Unregisters an active stream source and drops its consumers.
+    /// Unregisters an active stream source and drops its consumers, cache, and state.
     pub fn unregister_source(&self, source_ssrc: u32) {
         self.sources.remove(&source_ssrc);
         self.consumers.remove(&source_ssrc);
+        self.nack_buffers.remove(&source_ssrc);
+        self.keyframe_controller.reset(source_ssrc);
     }
 
     /// Attaches a new consumer subscription to a stream source.
@@ -56,12 +67,18 @@ impl RtpRouter {
 
     /// Routes an incoming RTP packet on the hot path.
     ///
-    /// For every active consumer, rewrites the packet with continuous sequence numbering
-    /// and the subscriber's negotiated SSRC.
+    /// Stores the packet into the source's NackBuffer ring buffer,
+    /// and for every active consumer, rewrites the packet with continuous
+    /// sequence numbering and the subscriber's negotiated SSRC.
     pub fn route_packet(&self, packet: &AlvioRtpPacket) -> Vec<AlvioRtpPacket> {
         let source_ssrc = packet.header.ssrc;
-        let mut forwarded = Vec::new();
 
+        // Cache packet in NACK ring buffer for instant local retransmission
+        if let Some(buffer) = self.nack_buffers.get(&source_ssrc) {
+            buffer.put(packet.clone());
+        }
+
+        let mut forwarded = Vec::new();
         if let Some(consumer_list) = self.consumers.get(&source_ssrc) {
             forwarded.reserve(consumer_list.len());
             for consumer in consumer_list.iter() {
@@ -73,6 +90,24 @@ impl RtpRouter {
         }
 
         forwarded
+    }
+
+    /// Handle NACK retransmission request: retrieves cached packets from the source ring buffer.
+    pub fn handle_nack(&self, source_ssrc: u32, requested_seqs: &[u16]) -> Vec<AlvioRtpPacket> {
+        if let Some(buffer) = self.nack_buffers.get(&source_ssrc) {
+            buffer.get_batch(requested_seqs)
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Evaluates keyframe request (PLI/FIR) with rate limiting against keyframe storms.
+    pub fn request_keyframe(&self, source_ssrc: u32, kind: KeyframeKind, now: Instant) -> bool {
+        self.keyframe_controller.request_keyframe(source_ssrc, kind, now)
+    }
+
+    pub fn nack_buffer(&self, source_ssrc: u32) -> Option<Arc<NackBuffer>> {
+        self.nack_buffers.get(&source_ssrc).map(|r| Arc::clone(&r))
     }
 
     pub fn active_source_count(&self) -> usize {
@@ -95,9 +130,10 @@ mod tests {
     use super::*;
     use alvio_core::{PeerId, StreamKind, StreamLayer, TrackId};
     use bytes::Bytes;
+    use std::time::Duration;
 
     #[test]
-    fn test_rtp_fanout_routing() {
+    fn test_rtp_fanout_routing_and_nack_cache() {
         let router = RtpRouter::new();
 
         let source_ssrc = 0x11112222;
@@ -167,5 +203,18 @@ mod tests {
         // Monotonic increment for both subscribers
         assert_eq!(routed2[0].header.sequence_number, 101);
         assert_eq!(routed2[1].header.sequence_number, 501);
+
+        // Test NACK handling from source's NackBuffer:
+        // Request retransmission of packet sequence 1 and 2
+        let retransmitted = router.handle_nack(source_ssrc, &[1, 2, 99]);
+        assert_eq!(retransmitted.len(), 2);
+        assert_eq!(retransmitted[0].header.sequence_number, 1);
+        assert_eq!(retransmitted[1].header.sequence_number, 2);
+
+        // Test Keyframe Rate Limiting via Router
+        let now = Instant::now();
+        assert!(router.request_keyframe(source_ssrc, KeyframeKind::Pli, now));
+        // Second immediate call throttled
+        assert!(!router.request_keyframe(source_ssrc, KeyframeKind::Pli, now + Duration::from_millis(50)));
     }
 }

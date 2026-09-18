@@ -21,8 +21,8 @@ Classification:
 | **WebRTC Core** | ICE / DTLS-SRTP Handshake | `IMPLEMENTED` | Phase 3 | Peer-to-peer media path |
 | **SFU** | RTP Packet Router (Hot Path) | `IMPLEMENTED` | Phase 4 | Zero-allocation Bytes |
 | **SFU** | SSRC & Sequence Alignment | `IMPLEMENTED` | Phase 4 | Continuous numbering |
-| **SFU** | NACK Ring Buffer & PLI / FIR | `PLANNED` | Phase 5 | Packet loss recovery |
-| **SFU** | TWCC & Bandwidth Estimation | `PLANNED` | Phase 5 | Congestion control |
+| **SFU** | NACK Ring Buffer & PLI / FIR | `IMPLEMENTED` | Phase 5 | Packet loss recovery |
+| **SFU** | TWCC & Bandwidth Estimation | `IMPLEMENTED` | Phase 5 | Congestion control |
 | **SFU** | Simulcast Layer Selection | `PLANNED` | Phase 6 | Low/Med/High switching |
 | **Data** | WebRTC Data Channels | `PLANNED` | Phase 7 | Reliable & Unreliable |
 | **Egress** | Virtual Recording Peer | `PLANNED` | Phase 8 | Non-blocking tap |
