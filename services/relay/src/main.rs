@@ -123,7 +123,9 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
         None,
     );
     let whip_router = alvio_ingress::create_whip_router(whip_state);
-    let app = signaling_app.nest("/whip", whip_router);
+    let app = signaling_app
+        .nest("/whip", whip_router)
+        .route("/metrics", axum::routing::get(alvio_observe::metrics_handler));
 
     let addr = format!("{}:{}", config.server.bind_address, config.server.http_port);
     let listener = tokio::net::TcpListener::bind(&addr)
@@ -132,7 +134,7 @@ async fn run_server_lifecycle(config: &AlvioConfig) -> AlvioResult<()> {
 
     info!(
         bind = %addr,
-        "Signaling, WHIP Ingress, and HTTP gateway ready at http://{addr}/, ws://{addr}/ws, and http://{addr}/whip/{{room_id}}"
+        "Signaling, WHIP Ingress, and Observability ready at http://{addr}/, ws://{addr}/ws, http://{addr}/whip/{{room_id}}, and http://{addr}/metrics"
     );
 
     // Run Axum server with graceful drain mode on shutdown

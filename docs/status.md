@@ -30,7 +30,7 @@ Classification:
 | **Storage** | StorageBackend (Local & S3) | `IMPLEMENTED` | Phase 8 | Pluggable trait |
 | **Ingress** | WHIP Endpoint | `IMPLEMENTED` | Phase 9 | OBS / WebRTC ingest |
 | **Hooks** | Webhook Dispatcher & HMAC | `IMPLEMENTED` | Phase 10 | Retry & backoff |
-| **Observability**| Prometheus `/metrics` & Health | `PLANNED` | Phase 11 | `/health` and `/ready` |
+| **Observability**| Prometheus `/metrics` & Health | `IMPLEMENTED` | Phase 11 | `/health` and `/ready` |
 | **Scaling** | Node Placement & Drain Mode | `PLANNED` | Phase 12 | Authoritative room node |
 | **Packaging** | Dockerfile & Docker Compose | `PLANNED` | Phase 13 | Self-hosted 1-command up |
 | **Client SDK (Web)** | `@alviorelay/client` (TypeScript) | `PLANNED` | Phase 14 | Modern browsers (Chrome, Firefox, Safari, Edge) |
@@ -40,3 +40,27 @@ Classification:
 | **Client SDK (Mobile iOS)** | `alvio-ios` (Swift / iOS WebRTC) | `PLANNED` | Phase 14 | iPhone, iPad, Apple Silicon |
 | **Client SDK (Cross-Platform)** | `alvio_flutter` & `@alviorelay/react-native` | `PLANNED` | Phase 14 | Multi-platform mobile/desktop hybrid apps |
 | **Benchmarks** | Criterion Packet Routing Bench | `PLANNED` | Phase 15 | Sub-microsecond hot path |
+
+---
+
+## Full Documentation Pages Roadmap & Specification
+
+Rencana komprehensif halaman dokumentasi resmi AlvioRelay untuk memandu developer, software engineer, dan system administrator dalam integrasi dan operasional:
+
+| Halaman Dokumentasi | Path Target | Target Pembaca & Cakupan Materi | Status |
+| :--- | :--- | :--- | :--- |
+| **1. Architecture Deep-Dive** | `docs/architecture.md` | Core developers. Pemisahan bidang kontrol (Control Plane), Hot-Path SFU Sans-I/O `str0m`, zero-allocation routing, dan process-isolated recording. | `LIVE` |
+| **2. Signaling Protocol Spec** | `docs/protocol-spec.md` | Client SDK developers. Schema JSON v1 message envelopes (`join`, `offer`, `answer`, `candidate`, `track_published`, `peer_left`), heartbeats, dan reconnection backoff. | `PLANNED` |
+| **3. SCTP Data Channels Guide** | `docs/data-channels.md` | Developers. Pembuatan kanal data `Reliable` (chat, izin) vs `UnreliableLossy` (koordinat kursor, telemetry, game state) berlatensi ultra-rendah. | `PLANNED` |
+| **4. WHIP Ingestion Guide** | `docs/whip-guide.md` | Streamers & Broadcasters. Panduan konfigurasi OBS Studio, vMix, FFmpeg, dan WebRTC camera encoders langsung ke endpoint HTTP POST `/whip/{room_id}`. | `PLANNED` |
+| **5. Webhook & Security Guide** | `docs/webhooks-guide.md` | Backend developers. Verifikasi tanda tangan HMAC-SHA256 (`Alvio-Signature`), perlindungan replay attack (`Alvio-Timestamp`), dan katalog event lengkap. | `PLANNED` |
+| **6. Client SDK (Web)** | `docs/clients/web.md` | Frontend developers. `@alviorelay/client` untuk React, Next.js, Vue, Svelte: audio/video publish, subscribe, layer switching simulcast, dan screen share. | `PLANNED` |
+| **7. Client SDK (Desktop Windows)** | `docs/clients/windows.md` | Desktop developers. Native Windows `.exe` (C++ / Rust / WinUI / WPF), WASAPI low-latency audio capture, DirectX / DXGI screen capture. | `PLANNED` |
+| **8. Client SDK (macOS & Linux)** | `docs/clients/desktop-unix.md` | Desktop developers. Native macOS (Swift / Metal / CoreMedia) dan Linux (GTK / Tauri / PipeWire audio capture). | `PLANNED` |
+| **9. Client SDK (Mobile Android)** | `docs/clients/android.md` | Mobile developers. Kotlin SDK, integrasi Camera2 API, AudioRecord / AAudio, background service calling, dan Picture-in-Picture (PiP). | `PLANNED` |
+| **10. Client SDK (Mobile iOS)** | `docs/clients/ios.md` | Mobile developers. Swift SDK, AVFoundation capture, CallKit system incoming call UI, dan ReplayKit in-app screen broadcast. | `PLANNED` |
+| **11. Client SDK (Cross-Platform)** | `docs/clients/cross-platform.md` | Hybrid developers. `alvio_flutter` (Flutter) dan `@alviorelay/react-native` untuk rilis multi-platform cepat. | `PLANNED` |
+| **12. Observability & Dashboards** | `docs/observability.md` | DevOps & SRE. Prometheus `/metrics` scraping, Grafana dashboard JSON template, alerting rules, dan probe `/health`, `/ready`. | `PLANNED` |
+| **13. Production Deployment** | `docs/deployment.md` | DevOps. 1-command Docker Compose, bare-metal systemd setup, reverse proxy Nginx/Caddy TLS termination, dan multi-node clustering. | `PLANNED` |
+| **14. Tuning & Troubleshooting** | `docs/troubleshooting.md` | SRE. Linux sysctl UDP buffer tuning (`rmem_max`, `wmem_max`), debugging packet loss, diagnosa NACK storm, dan profiling latency. | `PLANNED` |
+

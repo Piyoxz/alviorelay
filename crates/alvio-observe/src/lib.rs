@@ -1,5 +1,11 @@
+pub mod health;
+pub mod metrics;
+
 use alvio_core::AlvioResult;
 use tracing_subscriber::{fmt, EnvFilter};
+
+pub use health::{get_uptime_secs, health_handler, init_server_start_time, metrics_handler, ready_handler};
+pub use metrics::{get_metrics, AlvioMetrics};
 
 /// Initializes structured logging for AlvioRelay using `tracing` and `tracing-subscriber`.
 pub fn init_telemetry(default_level: &str) -> AlvioResult<()> {
@@ -14,6 +20,8 @@ pub fn init_telemetry(default_level: &str) -> AlvioResult<()> {
         .with_line_number(false)
         .compact()
         .init();
+
+    init_server_start_time();
 
     Ok(())
 }

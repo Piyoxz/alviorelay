@@ -108,6 +108,12 @@ name = "alvio-observe"
 version = "0.1.0"
 dependencies = [
  "alvio-core",
+ "axum",
+ "http-body-util",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
  "tracing",
  "tracing-subscriber",
 ]
