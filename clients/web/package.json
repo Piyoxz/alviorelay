@@ -2,7 +2,15 @@
   "name": "@alviorelay/client",
   "version": "0.1.0",
   "description": "High-performance TypeScript WebRTC client SDK for AlvioRelay SFU",
-  "keywords": ["webrtc", "sfu", "realtime", "video", "audio", "streaming", "alviorelay"],
+  "keywords": [
+    "webrtc",
+    "sfu",
+    "realtime",
+    "video",
+    "audio",
+    "streaming",
+    "alviorelay"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -18,7 +26,7 @@
   "license": "MIT OR Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Piyoxz/alviorelay"
+    "url": "git+https://github.com/Piyoxz/alviorelay.git"
   },
   "devDependencies": {
     "typescript": "^5.6.2"
